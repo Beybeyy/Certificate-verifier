@@ -57,23 +57,8 @@
             text-decoration: underline;
         }
 
-        /* ===== LOGO SECTION ===== */
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            padding: 30px 10px 10px 10px; /* Spacing between nav and login card */
-        }
-
-        .logo-container img {
-            height: 60px; /* Adjust size to match your images */
-            width: auto;
-            object-fit: contain;
-        }
-
-        /* ===== BURGER ICON & ANIMATION ===== */
-        .burger {
+         /* ===== BURGER ICON & ANIMATION ===== */
+         .burger {
             display: none;
             flex-direction: column;
             cursor: pointer;
@@ -100,65 +85,51 @@
             transform: rotate(45deg) translate(-5px, -6px);
         }
 
-        
-
-        /* ===== LOGIN CONTAINER ===== */
-        .login-wrapper {
+        /* ===== REGISTER CARD ===== */
+        .register-wrapper {
             flex: 1;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             padding: 20px;
         }
 
-        .login-card {
+        .register-card {
             width: 100%;
-            max-width: 420px;
-            border: 1.5px solid #0056b3;
-            border-radius: 20px;
-            padding: 40px 30px;
-            text-align: center;
+            max-width: 450px;
+            border: 2px solid #0b4a82;
+            border-radius: 25px;
+            padding: 40px 35px;
+            text-align: left; /* Text labels are left-aligned in image */
             background: #fff;
         }
 
-        .login-card h2 {
-            color: #004085;
-            margin-bottom: 25px;
-            font-size: 24px;
+        .register-card h2 { 
+            color: #0b4a82; 
+            margin-bottom: 25px; 
+            font-size: 26px; 
+            text-align: center; /* Heading is centered */
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        .form-group { margin-bottom: 15px; }
+        
+        .form-group label {
+            display: block;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 15px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 1.2px solid #8ba8c7;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         /* ===== BUTTONS ===== */
-        .btn-upload {
-            background-color: #d3d3d3; /* Gray by default */
-            color: #777;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: not-allowed;
-            margin-bottom: 15px;
-            transition: 0.3s;
-        }
-
-        .btn-upload.admin-active {
-            background-color: #28a745; /* Green */
-            color: white;
-            cursor: pointer;
-        }
-
-        .btn-login {
+        .btn-register {
             background-color: #0056b3;
             color: white;
             border: none;
@@ -167,26 +138,8 @@
             font-size: 16px;
             cursor: pointer;
             width: 100%;
-            display: block;
+            margin-top: 10px;
             margin-bottom: 20px;
-        }
-
-        /* ===== NEW REGISTRATION TEXT STYLING ===== */
-        .register-text {
-            font-size: 15px;
-            margin-bottom: 15px;
-            color: #1a1a1a;
-            font-weight: 500;
-        }
-
-        .register-text a {
-            color: #0b4a82;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .register-text a:hover {
-            text-decoration: underline;
         }
 
         .back-link {
@@ -194,11 +147,12 @@
             color: #0b4a82;
             font-size: 14px;
             font-weight: 600;
-            display: inline-flex;
+            display: flex;
+            justify-content: center;
             align-items: center;
             gap: 5px;
         }
-
+        
         /* ===== MOBILE RESPONSIVE LOGIC ===== */
         @media (max-width: 768px) {
             .top-nav {
@@ -233,9 +187,9 @@
                 text-align: center;
             }
         }
+
     </style>
 </head>
-<body>
 
 <nav class="top-nav">
     <div class="nav-brand">
@@ -256,53 +210,58 @@
     </div>
 </nav>
 
-<div class="logo-container">
-    <img src="logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Logo">
-    <img src="deped-csjdm-logo.png" alt="Division Logo">
-</div>
-
-<main class="login-wrapper">
-    <div class="login-card">
-        <h2>Login</h2>
-        <form>
+<main class="register-wrapper">
+    <div class="register-card">
+        <h2>Register</h2>
+        
+        <form action="register_process.php" method="POST">
             <div class="form-group">
-                <input type="email" placeholder="Enter your email" required>
+                <label>Complete Name</label>
+                <input type="text" name="fullname" required>
             </div>
+            
             <div class="form-group">
-                <input type="password" placeholder="Enter your password" required>
+                <label>Email</label>
+                <input type="email" name="email" required>
             </div>
-
-            <button type="button" id="uploadBtn" class="btn-upload" disabled>upload excel</button>
-
-            <button type="submit" class="btn-login">Login</button>
-
-            <div class="register-text">Don't have an account? <a href="register.php">Register here</a> </div>
-
-            <a href="http://10.10.8.218:8080/Certificate-verifier/index.php" class="back-link">
-                <span>&lt;</span> back to verifier
+            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" name="confirm_password" required>
+            </div>
+            
+            <button type="submit" class="btn-register">Register</button>
+            
+            <a href="login.php" class="back-link">
+                <span>&lt;</span> back to login
             </a>
         </form>
     </div>
 </main>
 
-<script>
-    const burger = document.getElementById('burger');
-    const navMenu = document.getElementById('nav-menu');
+        <script>
+            const burger = document.getElementById('burger');
+            const navMenu = document.getElementById('nav-menu');
 
-    // Toggle menu and burger animation
-    burger.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        burger.classList.toggle('toggle');
-    });
+            // Toggle menu and burger animation
+            burger.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                burger.classList.toggle('toggle');
+            });
 
-    // Close menu when a link is clicked (useful for mobile)
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('active');
-            burger.classList.remove('toggle');
-        });
-    });
-</script>
+            // Close menu when a link is clicked (useful for mobile)
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('active');
+                    burger.classList.remove('toggle');
+                });
+            });
+        </script>
 
 </body>
 </html>
