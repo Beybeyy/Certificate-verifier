@@ -122,15 +122,46 @@
             font-size: 16px;
         }
 
+        /* ===== BUTTONS ===== */
+        .btn-upload {
+            background-color: #d3d3d3; /* Gray by default */
+            color: #777;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: not-allowed;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        .btn-upload.admin-active {
+            background-color: #28a745; /* Green */
+            color: white;
+            cursor: pointer;
+        }
+
         .btn-login {
             background-color: #0056b3;
             color: white;
             border: none;
             padding: 12px 40px;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
             width: 100%;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #0b4a82;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
         /* ===== MOBILE RESPONSIVE LOGIC ===== */
@@ -200,7 +231,14 @@
             <div class="form-group">
                 <input type="password" placeholder="Enter your password" required>
             </div>
+
+            <button type="button" id="uploadBtn" class="btn-upload" disabled>upload excel</button>
+
             <button type="submit" class="btn-login">Login</button>
+
+            <a href="verifier.php" class="back-link">
+                <span>&lt;</span> back to verifier
+            </a>
         </form>
     </div>
 </main>
