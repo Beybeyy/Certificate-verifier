@@ -143,8 +143,10 @@
 <!-- TOP NAV -->
 <nav class="top-nav">
     <div class="nav-brand">
+       <a href="http://10.10.8.218:8080/Certificate-verifier/index.php" style="text-decoration:none; color:inherit;">
         Department of Education<br>
         Certificate Verifier
+</a>
     </div>
     <div class="nav-links">
         <a href="#">Home</a>
@@ -166,7 +168,7 @@
 
         <hr class="divider">
 
-        <div class="login-text">Are you a teacher or administrator?</div>
+        <div class="login-text">Refer to the area below your certificate to find your control number.</div>
         <a href="#" class="login-link">Login to the system</a>
     </div>
 </div>
