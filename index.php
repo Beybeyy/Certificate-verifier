@@ -46,32 +46,74 @@ if (isset($_GET['control_number'])) {
             font-family: "Segoe UI", Arial, sans-serif;
             background: #ffffff;
             color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
         /* ===== TOP NAV ===== */
         .top-nav {
             background-color: #0b4a82;
-            padding: 18px 30px;
+            padding: 15px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: #ffffff;
+            position: relative;
+            z-index: 1000;
         }
 
         .nav-brand {
-            font-size: 20px;
-            line-height: 1.3;
+            font-size: 18px;
+            line-height: 1.2;
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            transition: 0.3s ease-in-out;
         }
 
         .nav-links a {
             color: #ffffff;
             text-decoration: none;
-            margin-left: 30px;
-            font-size: 16px;
+            margin-left: 35px;
+            font-size: 15px;
+            font-weight: 400;
         }
 
         .nav-links a:hover {
             text-decoration: underline;
+        }
+
+        /* ===== BURGER ICON & ANIMATION ===== */
+        .burger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+            z-index: 1001;
+        }
+
+        .burger span {
+            height: 3px;
+            width: 28px;
+            background: white;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        /* Animation to transform burger into 'X' */
+        .burger.toggle span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        .burger.toggle span:nth-child(2) {
+            opacity: 0;
+        }
+        .burger.toggle span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
         }
 
         /* ===== PAGE CENTER ===== */
@@ -156,15 +198,38 @@ if (isset($_GET['control_number'])) {
             text-decoration: underline;
         }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 700px) {
-            .card {
-                width: 90%;
-                padding: 30px 25px;
+        /* ===== MOBILE RESPONSIVE LOGIC ===== */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 15px 20px;
+            }
+
+            .burger {
+                display: flex;
             }
 
             .nav-links {
-                display: none;
+                position: fixed;
+                right: -100%; /* Hidden off-screen to the right */
+                top: 0;
+                height: 100vh;
+                width: 30%; /* Menu takes 70% of screen width */
+                background-color: #0b4a82;
+                flex-direction: column;
+                justify-content: center;
+                gap: 30px;
+                box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+            }
+
+            .nav-links.active {
+                right: 0; /* Slide in */
+            }
+
+            .nav-links a {
+                margin: 0;
+                font-size: 20px;
+                width: 100%;
+                text-align: center;
             }
         }
     </style>
@@ -174,12 +239,17 @@ if (isset($_GET['control_number'])) {
 <!-- TOP NAV -->
 <nav class="top-nav">
     <div class="nav-brand">
-       <a href="http://10.10.8.218:8080/Certificate-verifier/index.php" style="text-decoration:none; color:inherit;">
         Department of Education<br>
         Certificate Verifier
-</a>
     </div>
-    <div class="nav-links">
+
+    <div class="burger" id="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="nav-links" id="nav-menu">
         <a href="#">Home</a>
         <a href="#">About</a>
         <a href="#">Contact</a>
@@ -225,6 +295,25 @@ if (isset($_GET['control_number'])) {
         <a href="#" class="login-link">Login to the system</a>
     </div>
 </div>
+
+        <script>
+            const burger = document.getElementById('burger');
+            const navMenu = document.getElementById('nav-menu');
+
+            // Toggle menu and burger animation
+            burger.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                burger.classList.toggle('toggle');
+            });
+
+            // Close menu when a link is clicked (useful for mobile)
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('active');
+                    burger.classList.remove('toggle');
+                });
+            });
+        </script>
 
 </body>
 </html>
