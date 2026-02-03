@@ -1,3 +1,34 @@
+<?php
+session_start();
+require_once __DIR__ . "/config/db.php";
+
+$result = null;
+$error = "";
+
+// Handle certificate search
+if (isset($_GET['control_number'])) {
+    $control = trim($_GET['control_number']);
+
+    if ($control !== "") {
+        $stmt = $conn->prepare("
+            SELECT c.control_number, c.seminar_title, c.certificate_file, u.name
+            FROM certificates c
+            JOIN users u ON c.teacher_id = u.id
+            WHERE c.control_number = ?
+        ");
+        $stmt->bind_param("s", $control);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $error = "❌ Certificate not found or invalid control number.";
+        }
+    } else {
+        $error = "⚠️ Please enter a control number.";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -161,10 +192,32 @@
         <h2>Certificate Verification</h2>
         <p class="subtitle">Enter the control number to verify the certificate</p>
 
+        <form method="GET">
         <div class="search-row">
-            <input type="text" placeholder="Enter Control Number">
-            <button>Search</button>
+        <input type="text" name="control_number" placeholder="Enter Control Number"
+               value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" required>
+        <button type="submit">Search</button>
+    </div>
+</form>
+    <?php if ($error): ?>
+        <div class="error"><?= $error ?></div>
+    <?php endif; ?>
+
+    <?php if ($result && $result->num_rows > 0): 
+        $row = $result->fetch_assoc();
+    ?>
+        <div class="result">
+            <p><strong>Name:</strong> <?= htmlspecialchars($row['name']) ?></p>
+            <p><strong>Seminar Title:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
+            <p><strong>Control Number:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
+            <p>
+                <a href="uploads/certificates/<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">
+                    📄 View Certificate
+                </a>
+            </p>
+            <p><strong>Status:</strong> ✅ Verified</p>
         </div>
+    <?php endif; ?>
 
         <hr class="divider">
 
