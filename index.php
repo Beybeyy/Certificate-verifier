@@ -292,7 +292,7 @@ if (isset($_GET['control_number'])) {
         <hr class="divider">
 
         <div class="login-text">Refer to the area below your certificate to find your control number.</div>
-        <a href="#" class="login-link">Login to the system</a>
+        <a href="http://10.10.8.218:8080/Certificate-verifier/login.php" class="login-link">Login</a>
     </div>
 </div>
 

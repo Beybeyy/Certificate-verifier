@@ -236,7 +236,7 @@
 
             <button type="submit" class="btn-login">Login</button>
 
-            <a href="verifier.php" class="back-link">
+            <a href="http://10.10.8.218:8080/Certificate-verifier/index.php" class="back-link">
                 <span>&lt;</span> back to verifier
             </a>
         </form>
