@@ -265,7 +265,7 @@ if (isset($_GET['control_number'])) {
         <form method="GET">
         <div class="search-row">
         <input type="text" name="control_number" placeholder="Enter Control Number"
-               value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" required>
+               value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" autocomplete="off"required>
         <button type="submit">Search</button>
     </div>
 </form>
