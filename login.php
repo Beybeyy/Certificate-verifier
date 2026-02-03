@@ -317,7 +317,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="password" name="password" placeholder="Enter your password" required autocomplete="off">
             </div>
 
-            <button type="button" id="uploadBtn" class="btn-upload" disabled>upload excel</button>
+            <!-- <button type="button" id="uploadBtn" class="btn-upload" disabled>upload excel</button> -->
 
             <button type="submit" class="btn-login">Login</button>
 
