@@ -4,247 +4,171 @@
     <meta charset="UTF-8">
     <title>Certificate Verifier</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-   
-   <style>
-        
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            min-height: 100vh;
             font-family: "Segoe UI", Arial, sans-serif;
-            background: linear-gradient(135deg, #e3f2fd, #f4f6f8);
+            background: #ffffff;
+            color: #1a1a1a;
+        }
+
+        /* ===== TOP NAV ===== */
+        .top-nav {
+            background-color: #0b4a82;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #ffffff;
+        }
+
+        .nav-brand {
+            font-size: 20px;
+            line-height: 1.3;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 16px;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== PAGE CENTER ===== */
+        .page-wrapper {
+            height: calc(100vh - 80px);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .top-nav {
-            background-color: #0b3c78;
-            padding: 18px 0;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            color:white;
-            }
-
-        .nav-brand { 
-            text-align:left; 
-            line-height:1.2; 
-            font-weight:bold; 
-            font-size:18px; 
-            margin-left:20px; 
-        
-        }
-        .nav-brand small { 
-            font-weight:normal; 
-            font-size:14px; 
-            opacity:0.9; }
-
-        .nav-links a { 
-            color:white; 
-            text-decoration:none; 
-            margin:0 20px; 
-            font-size:16px; 
-        }
-
-        .nav-links a:hover { 
-            text-decoration:underline; 
-        } 
-
-        .container {
-            width: 100%;
-            max-width: 520px;
-            background: #ffffff;
-            padding: 30px 28px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        }
-
-        h2 {
+        /* ===== CARD ===== */
+        .card {
+            width: 600px;
+            padding: 40px 45px;
+            border: 1.8px solid #4a7fc2;
+            border-radius: 16px;
             text-align: center;
-            margin-bottom: 10px;
-            color: #1f3b78;
         }
 
-        .subtitle {
-            text-align: center;
-            font-size: 14px;
+        .card h2 {
+            margin: 0;
+            color: #123a6f;
+            font-size: 24px;
+        }
+
+        .card p.subtitle {
+            margin: 10px 0 30px;
             color: #666;
-            margin-bottom: 25px;
+            font-size: 14px;
         }
 
-        /* Search box */
-        .search-box {
-            position: relative;
+        /* ===== SEARCH ROW ===== */
+        .search-row {
+            display: flex;
+            gap: 10px;
         }
 
-        .search-box input {
-            width: 100%;
-            padding: 14px 52px 14px 14px;
+        .search-row input {
+            flex: 1;
+            padding: 12px 14px;
             font-size: 15px;
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px solid #cfd8dc;
             outline: none;
-            transition: border-color 0.3s;
         }
 
-        .search-box input:focus {
-            border-color: #1976d2;
-        }
-
-        .search-box button {
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
+        .search-row button {
+            padding: 12px 20px;
+            font-size: 15px;
+            border-radius: 6px;
             border: none;
             background: #1976d2;
-            color: #fff;
-            padding: 9px 16px;
-            border-radius: 6px;
+            color: #ffffff;
             cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
         }
 
-        .search-box button:hover {
-            background: #125aa0;
+        .search-row button:hover {
+            background: #155fa8;
         }
 
-        /* Result */
-        .result {
-            background: #e8f5e9;
-            border-left: 4px solid #2e7d32;
-            padding: 15px 18px;
-            margin-top: 20px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .result p {
-            margin: 6px 0;
-        }
-
-        .result a {
-            color: #2e7d32;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .result a:hover {
-            text-decoration: underline;
-        }
-
-        /* Error */
-        .error {
-            background: #fdecea;
-            border-left: 4px solid #c62828;
-            color: #b71c1c;
-            padding: 12px 16px;
-            margin-top: 18px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        /* Login section */
-        .login-link {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 14px;
-        }
-
-        .login-link hr {
-            margin-bottom: 15px;
+        /* ===== DIVIDER ===== */
+        .divider {
+            margin: 28px 0 18px;
             border: none;
             border-top: 1px solid #e0e0e0;
         }
 
-        .login-link a {
-            display: inline-block;
-            margin-top: 6px;
-            text-decoration: none;
+        /* ===== LOGIN ===== */
+        .login-text {
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .login-link {
+            font-size: 14px;
             color: #1976d2;
+            text-decoration: none;
             font-weight: 600;
         }
 
-        .login-link a:hover {
+        .login-link:hover {
             text-decoration: underline;
         }
-        /* Responsive */
-        @media (max-width:850px) {
-            .main-container { flex-direction:column; text-align:center; padding:40px 20px; }
-            .welcome-wrapper { flex-direction:column; }
-}
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 700px) {
+            .card {
+                width: 90%;
+                padding: 30px 25px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
+
+<!-- TOP NAV -->
 <nav class="top-nav">
     <div class="nav-brand">
         Department of Education<br>
-        <small>Certificate Verifier</small>
+        Certificate Verifier
     </div>
     <div class="nav-links">
-        <a href="http://10.10.8.218:8080/log-in/LISproject/resources/views/pages/home.blade.php">Home</a>
-        <a href="http://10.10.8.218:8080/log-in/LISproject/resources/views/pages/about.blade.php">About</a>
-        <a href="http://10.10.8.218:8080/log-in/LISproject/resources/views/pages/contact.blade.php">Contact</a>
-
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
     </div>
 </nav>
 
+<!-- CENTER CONTENT -->
+<div class="page-wrapper">
+    <div class="card">
+        <h2>Certificate Verification</h2>
+        <p class="subtitle">Enter the control number to verify the certificate</p>
 
-<div class="container">
+        <div class="search-row">
+            <input type="text" placeholder="Enter Control Number">
+            <button>Search</button>
+        </div>
 
-    <!-- 🔍 Certificate Search -->
-    <h2>Certificate Verification</h2>
-    <div class="subtitle">
-        Enter the control number to verify the certificate
+        <hr class="divider">
+
+        <div class="login-text">Are you a teacher or administrator?</div>
+        <a href="#" class="login-link">Login to the system</a>
     </div>
-
-    <form method="GET">
-        <div class="search-box">
-            <input
-                type="text"
-                name="control_number"
-                placeholder="Enter Control Number"
-                value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>"
-                required
-            >
-            <button type="submit">Search</button>
-        </div>
-    </form>
-
-    <!-- ❌ Error Message -->
-    <?php if (!empty($error)): ?>
-        <div class="error">
-            <?= htmlspecialchars($error) ?>
-        </div>
-    <?php endif; ?>
-
-    <!-- ✅ Search Result -->
-    <!--
-    <?php if ($result && $result->num_rows > 0):
-        $row = $result->fetch_assoc();
-    ?>
-        <div class="result">
-            <p><strong>Name:</strong> <?= htmlspecialchars($row['name']) ?></p>
-            <p><strong>Certificate Title:</strong> <?= htmlspecialchars($row['certificate_title']) ?></p>
-            <p><strong>Control Number:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
-            <p>
-                <a href="uploads/certificates/<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">
-                    View Certificate (PDF)
-                </a>
-            </p>
-        </div>
-    <?php endif; ?>
-    -->
-
-    <!-- 🔐 Login Option -->
-    <div class="login-link">
-        <hr>
-        <p>Are you a teacher or administrator?</p>
-        <a href="login.php">Login to the system</a>
-    </div>
-
 </div>
 
 </body>
