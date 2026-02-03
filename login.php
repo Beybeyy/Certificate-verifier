@@ -1,55 +1,44 @@
 <?php
 session_start();
-require_once __DIR__ . "/config/db.php"; // Adjust path if needed
+require_once __DIR__ . "/config/db.php";
 
-// Handle registration
+$error = "";
+
+// Handle login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $fullname = trim($_POST['fullname'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
-    $confirm_password = trim($_POST['confirm_password'] ?? '');
 
-    // Validation
-    if (empty($fullname) || empty($email) || empty($password) || empty($confirm_password)) {
-        $_SESSION['error'] = "⚠️ All fields are required!";
-        header("Location: register.php");
-        exit();
-    }
-
-    if ($password !== $confirm_password) {
-        $_SESSION['error'] = "⚠️ Passwords do not match!";
-        header("Location: register.php");
-        exit();
-    }
-
-    // Check if email exists
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
-    if ($stmt->num_rows > 0) {
-        $_SESSION['error'] = "⚠️ Email already registered!";
-        header("Location: register.php");
-        exit();
-    }
-    $stmt->close();
-
-    // Insert new user with default role 'teacher'
-    $role = "teacher";
-    $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $fullname, $email, $password, $role);
-
-    if ($stmt->execute()) {
-        $_SESSION['success'] = "✅ Registration successful! You can now log in.";
-        header("Location: register.php"); // Reload page to show message
-        exit();
+    if ($email === "" || $password === "") {
+        $error = "⚠️ Please enter email and password.";
     } else {
-        $_SESSION['error'] = "❌ Registration failed. Please try again.";
-        header("Location: register.php");
-        exit();
-    }
+        // Check credentials
+        $stmt = $conn->prepare("SELECT id, name, email, role FROM users WHERE email = ? AND password = ?");
+        $stmt->bind_param("ss", $email, $password);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    $stmt->close();
+        if ($result->num_rows === 1) {
+            $user = $result->fetch_assoc();
+
+            // Set sessions
+            $_SESSION['id']    = $user['id'];   // Important: use 'id'
+            $_SESSION['name']  = $user['name'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['role']  = $user['role'];
+
+            // Redirect based on role
+            if ($user['role'] === "teacher") {
+                header("Location: teacher/teacher_dash.php");
+                exit();
+            } else {
+                header("Location: admin/dashboard.php");
+                exit();
+            }
+        } else {
+            $error = "❌ Invalid email or password.";
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -318,12 +307,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <main class="login-wrapper">
     <div class="login-card">
         <h2>Login</h2>
-        <form>
+         <?php if($error) echo "<div class='error'>$error</div>"; ?>
+
+            <form method="POST">
             <div class="form-group">
-                <input type="email" placeholder="Enter your email" required>
+                <input type="email" name="email" placeholder="Enter your email" required autocomplete="off">
             </div>
             <div class="form-group">
-                <input type="password" placeholder="Enter your password" required>
+                <input type="password" name="password" placeholder="Enter your password" required autocomplete="off">
             </div>
 
             <button type="button" id="uploadBtn" class="btn-upload" disabled>upload excel</button>
