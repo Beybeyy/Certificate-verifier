@@ -1,3 +1,57 @@
+<?php
+session_start();
+require_once __DIR__ . "/config/db.php"; // Adjust path if needed
+
+// Handle registration
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $fullname = trim($_POST['fullname'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+    $confirm_password = trim($_POST['confirm_password'] ?? '');
+
+    // Validation
+    if (empty($fullname) || empty($email) || empty($password) || empty($confirm_password)) {
+        $_SESSION['error'] = "⚠️ All fields are required!";
+        header("Location: register.php");
+        exit();
+    }
+
+    if ($password !== $confirm_password) {
+        $_SESSION['error'] = "⚠️ Passwords do not match!";
+        header("Location: register.php");
+        exit();
+    }
+
+    // Check if email exists
+    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        $_SESSION['error'] = "⚠️ Email already registered!";
+        header("Location: register.php");
+        exit();
+    }
+    $stmt->close();
+
+    // Insert new user with default role 'teacher'
+    $role = "teacher";
+    $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $fullname, $email, $password, $role);
+
+    if ($stmt->execute()) {
+        $_SESSION['success'] = "✅ Registration successful! You can now log in.";
+        header("Location: register.php"); // Reload page to show message
+        exit();
+    } else {
+        $_SESSION['error'] = "❌ Registration failed. Please try again.";
+        header("Location: register.php");
+        exit();
+    }
+
+    $stmt->close();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
