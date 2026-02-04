@@ -98,9 +98,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .messages p { margin-bottom:5px; font-size:14px; }
         .success { color: #155724; }
         .error { color: #721c24; }
+        <style>
+        /* The Modal (background) */
+        .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 999; 
+        left: 0;
+        top: 0;
+        width: 100%; 
+        height: 100%;
+        overflow: auto; 
+        background-color: rgba(0,0,0,0.5); 
+        }
+
+        /* Modal Content */
+        .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto; 
+        padding: 20px;
+        border-radius: 10px;
+        width: 400px; 
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        position: relative;
+        }
+
+        /* Close Button */
+        .close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        }
+
+        .close:hover {
+        color: #000;
+        }
+</style>
+
     </style>
 </head>
 <body>
+    <div id="uploadModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Upload Certificates (CSV)</h2>
+    <form method="POST" enctype="multipart/form-data" action="upload_certificates.php">
+        <input type="file" name="csv_file" accept=".csv" required>
+        <button type="submit">Upload CSV</button>
+    </form>
+    <div id="modalMessages"></div>
+  </div>
+</div>
 
 <h2>Upload Certificates (CSV)</h2>
 
@@ -118,6 +170,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endforeach; ?>
 </div>
 <?php endif; ?>
+    <script>
+    // Get modal elements
+    const modal = document.getElementById("uploadModal");
+    const btn = document.getElementById("uploadBtn");
+    const span = document.getElementsByClassName("close")[0];
+
+    // Open modal on button click
+    btn.onclick = function() {
+    modal.style.display = "block";
+    }
+
+    // Close modal on X click
+    span.onclick = function() {
+    modal.style.display = "none";
+    }
+
+    // Close modal when clicking outside of modal
+    window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+    }
+    </script>
 
 </body>
 </html>

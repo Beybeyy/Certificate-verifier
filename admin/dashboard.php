@@ -7,6 +7,78 @@ if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
+// Handle CSV Upload
+$messages = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
+
+    if ($_FILES['csv_file']['error'] !== 0) {
+        $messages[] = "❌ Please upload a valid CSV file.";
+    } else {
+
+        $file = fopen($_FILES['csv_file']['tmp_name'], "r");
+        if (!$file) {
+            $messages[] = "❌ Failed to open CSV file.";
+        } else {
+            fgetcsv($file); // skip header
+            $inserted = 0;
+            $skipped = 0;
+
+            while (($row = fgetcsv($file)) !== false) {
+                if (count(array_filter($row)) === 0) continue;
+
+                [$control, $teacher_email, $title, $certificate_file] = array_map('trim', $row);
+
+                if (!$control || !$teacher_email || !$title || !$certificate_file) {
+                    $messages[] = "Skipped row: missing field(s)";
+                    $skipped++;
+                    continue;
+                }
+
+                $check = $conn->prepare("SELECT id FROM certificates WHERE control_number=?");
+                $check->bind_param("s", $control);
+                $check->execute();
+                if ($check->get_result()->num_rows > 0) {
+                    $messages[] = "Skipped row '$control': control number exists";
+                    $skipped++;
+                    continue;
+                }
+
+                $stmt = $conn->prepare("SELECT id FROM users WHERE LOWER(email)=LOWER(?)");
+                $stmt->bind_param("s", $teacher_email);
+                $stmt->execute();
+                $res = $stmt->get_result();
+
+                $teacher_id = null;
+                $teacher_email_pending = null;
+                if ($res->num_rows > 0) {
+                    $teacher_id = $res->fetch_assoc()['id'];
+                } else {
+                    $teacher_email_pending = $teacher_email;
+                }
+
+                $stmt2 = $conn->prepare("
+                    INSERT INTO certificates
+                    (control_number, teacher_id, teacher_email_pending, seminar_title, certificate_file)
+                    VALUES (?, ?, ?, ?, ?)
+                ");
+                $stmt2->bind_param("sisss", $control, $teacher_id, $teacher_email_pending, $title, $certificate_file);
+
+                if ($stmt2->execute()) {
+                    $messages[] = "Inserted row '$control' successfully";
+                    $inserted++;
+                } else {
+                    $messages[] = "Skipped row '$control': failed to insert";
+                    $skipped++;
+                }
+            }
+
+            fclose($file);
+            $messages[] = "✅ Total inserted: $inserted | ❌ Total skipped: $skipped";
+        }
+    }
+}
+
+// Fetch certificates
 $sql = "
     SELECT c.id AS cert_id, c.control_number, c.seminar_title, c.certificate_file, c.created_at,
            u.id AS user_id, u.name, u.email
@@ -24,281 +96,145 @@ $result = $conn->query($sql);
 <title>Admin Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-     * {
-            box-sizing: border-box;
-        }
+/* General */
+body { margin:0; font-family:"Segoe UI", Arial, sans-serif; background:#fff; color:#1a1a1a; display:flex; flex-direction:column; min-height:100vh; overflow-x:hidden; }
+h2 { color:#0b4a82; margin-top:0; }
 
-    body {
-            margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #ffffff;
-            color: #1a1a1a;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden; /* Prevents side-scrolling on mobile */
-        }
+/* Top Nav */
+.top-nav { background:#0b4a82; padding:15px 40px; display:flex; justify-content:space-between; align-items:center; color:#fff; position:relative; z-index:1000; }
+.nav-brand { font-size:18px; font-weight:500; line-height:1.2; }
+.nav-links { display:flex; align-items:center; }
+.nav-links a { color:#fff; text-decoration:none; margin-left:35px; font-size:15px; font-weight:400; }
+.nav-links a:hover { text-decoration:underline; }
 
-    /* ===== TOP NAV ===== */
-    .top-nav {
-            background-color: #0b4a82;
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #ffffff;
-            position: relative;
-            z-index: 1000;
-        }
+/* Burger */
+.burger { display:none; flex-direction:column; cursor:pointer; gap:5px; z-index:1001; }
+.burger span { height:3px; width:28px; background:white; border-radius:5px; transition:all 0.3s ease; }
+.burger.toggle span:nth-child(1) { transform:rotate(-45deg) translate(-5px,6px); }
+.burger.toggle span:nth-child(2) { opacity:0; }
+.burger.toggle span:nth-child(3) { transform:rotate(45deg) translate(-5px,-6px); }
 
-        .nav-brand {
-            font-size: 18px;
-            line-height: 1.2;
-            font-weight: 500;
-        }
+/* Main */
+.main-container { margin:20px; }
+.upload-btn { background:rgb(25,105,39); color:white; padding:8px 25px; border-radius:10px; font-weight:bold; font-size:14px; text-decoration:none; transition:background 0.3s; }
+.upload-btn:hover { background:#e68a00; text-decoration:none; }
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            transition: 0.3s ease-in-out;
-        }
+/* Table */
+table { width:100%; border-collapse:collapse; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.05); }
+th, td { padding:12px 15px; border:1px solid #ddd; text-align:center; }
+th { background:#1976d2; color:#fff; }
+tr:nth-child(even){ background:#f9f9f9; }
+tr:hover{ background:#e3f2fd; }
+a { color:#0b4a82; font-weight:bold; text-decoration:none; }
+a:hover { text-decoration:underline; }
+.edit-btn { background:#ff9800; color:#fff; padding:5px 10px; border-radius:5px; }
+.edit-btn:hover { background:#f57c00; }
 
-        .nav-links a {
-            color: #ffffff;
-            text-decoration: none;
-            margin-left: 35px;
-            font-size: 15px;
-            font-weight: 400;
-        }
-
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
-
-        /* ===== BURGER ICON & ANIMATION ===== */
-       .burger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            gap: 5px;
-            z-index: 1001;
-        }
-
-        .burger span {
-            height: 3px;
-            width: 28px;
-            background: white;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-
-        /* Animation to transform burger into 'X' */
-        .burger.toggle span:nth-child(1) {
-            transform: rotate(-45deg) translate(-5px, 6px);
-        }
-        .burger.toggle span:nth-child(2) {
-            opacity: 0;
-        }
-        .burger.toggle span:nth-child(3) {
-            transform: rotate(45deg) translate(-5px, -6px);
-        }
-
-    .main-container{
-        margin: 0;
-    }
-
-    h2 { 
-        color:#0b4a82; 
-        margin-top: 10px;
-        margin-bottom: 10px; 
-    }
-
-    /* Styling for the new Upload Button */
-    .upload-btn {
-        background-color:rgb(25, 105, 39);
-        color: white;
-        padding: 8px 25px;
-        border-radius: 10px; /* Makes it pill-shaped like the screenshot */
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 14px;
-        transition: background 0.3s;
-    }
-
-    .upload-btn:hover {
-        background-color: #e68a00;
-        text-decoration: none;
-    }
-    
-    table { 
-        width:100%; 
-        border-collapse: collapse; 
-        background:#fff; 
-        box-shadow: 0 0 10px rgba(0,0,0,0.05); 
-    }
-    
-    th, td { 
-        padding: 12px 15px; 
-        border: 1px solid #ddd; 
-        text-align:left; 
-    }
-    
-    th { 
-        background-color:#1976d2; 
-        color:#fff; 
-    }
-    tr:nth-child(even){
-        background:#f9f9f9;
-    }
-
-    tr:hover{
-        background:#e3f2fd;
-    }
-    a { 
-        color:#0b4a82; 
-        text-decoration:none; 
-        font-weight:bold; 
-    }
-    a:hover { 
-        text-decoration:underline; 
-    }
-    .logout { 
-        float:right; margin-bottom:20px; 
-    }
-    .edit-btn { 
-        background:#ff9800; 
-        color:#fff; 
-        padding:5px 10px; 
-        border-radius:5px; 
-    }
-    .edit-btn:hover { 
-        background:#f57c00; 
-    }
-
-    /* ===== MOBILE RESPONSIVE LOGIC ===== */
-        /*@media (max-width: 768px) {
-            .top-nav {
-                padding: 15px 20px;
-            }*/
-
-            @media (max-width: 480px) {
-                .nav-links {
-                    width: 70%; /* Takes up more space on small phones */
-                }
-            }
-
-            .burger {
-                display: flex;
-            }
-
-            .nav-links {
-                position: fixed;
-                right: -100%; /* Hidden off-screen by default */
-                top: 0;
-                height: 100vh;
-                width: 190px; /* Fixed width for desktop consistency */
-                background-color: #0b4a82; /* Matches the blue-grey in your screenshot */
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                padding-top: 80px; 
-                gap: 0;
-                transition: 0.3s ease-in-out;
-                box-shadow: -5px 0 15px rgba(0,0,0,0.2);
-            }
-
-            .nav-links.active {
-                right: 0;
-            }
-
-            .nav-links a {
-                margin: 0;
-                padding: 20px 30px;
-                width: 100%;
-                text-align: left;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-                font-size: 18px;
-            }
-
+/* Modal */
+.modal { display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.5); }
+.modal-content { background:#fefefe; margin:10% auto; padding:20px; border-radius:10px; width:400px; position:relative; box-shadow:0 0 20px rgba(0,0,0,0.2); }
+.close { color:#aaa; position:absolute; top:10px; right:15px; font-size:28px; font-weight:bold; cursor:pointer; }
+.close:hover { color:#000; }
+.messages { margin-top:10px; background:#fff; padding:15px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.05); max-height:200px; overflow:auto; }
+.messages p { margin:5px 0; font-size:14px; }
+.success { color:#155724; }
+.error { color:#721c24; }
+input[type="file"] { display:block; margin-bottom:15px; padding:6px; }
+button { background:#0b4a82; color:#fff; padding:10px 25px; border-radius:5px; border:none; cursor:pointer; font-size:16px; }
+button:hover { background:#084a6b; }
 </style>
 </head>
 <body>
-  <!-- TOP NAV -->
+
+<!-- TOP NAV -->
 <nav class="top-nav">
-    <div class="nav-brand">
-        Department of Education<br>
-        Certificate Verifier
-    </div>
-
-    <div class="burger" id="burger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-
+    <div class="nav-brand">Department of Education<br>Certificate Verifier</div>
+    <div class="burger" id="burger"><span></span><span></span><span></span></div>
     <div class="nav-links" id="nav-menu">
         <a href="#">Home</a>
         <a href="#">About</a>
         <a href="#">Contact</a>
-        <a href="../login.php">➜] Logout</a>
+        <a href="../login.php">Logout</a>
     </div>
 </nav>  
 
-    <main class="main-container">
-        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
-            <h2 style="margin: 0;">Admin Dashboard - All Certificates</h2>
-            <a href="upload_excel.php" class="upload-btn">Upload</a>
+<main class="main-container">
+    <div style="display:flex; align-items:center; gap:20px; margin-bottom:20px;">
+        <h2>Admin Dashboard - All Certificates</h2>
+        <button id="uploadBtn" class="upload-btn">Upload</button>
+    </div>
+
+    <!-- Modal -->
+    <div id="uploadModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Upload Certificates (CSV)</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="csv_file" accept=".csv" required>
+            <button type="submit">Upload CSV</button>
+        </form>
+        <?php if (!empty($messages)): ?>
+        <div class="messages">
+            <?php foreach ($messages as $msg): ?>
+                <p class="<?= strpos($msg,'Inserted')!==false||strpos($msg,'✅')!==false?'success':'error' ?>">
+                    <?= htmlspecialchars($msg) ?>
+                </p>
+            <?php endforeach; ?>
         </div>
-
-        <?php if ($result->num_rows > 0): ?>
-        <table>
-            <tr>
-                <th>User Name</th>
-                <th>Email</th>
-                <th>Control Number</th>
-                <th>Seminar Title</th> 
-                <th>Certificate</th>
-                
-                <th>Action</th>
-            </tr>
-            <?php while ($row = $result->fetch_assoc()): ?>
-            <tr>
-                <td><?= htmlspecialchars($row['name']) ?></td>
-                <td><?= htmlspecialchars($row['email']) ?></td>
-                <td><?= htmlspecialchars($row['control_number']) ?></td>
-                <td><?= htmlspecialchars($row['seminar_title']) ?></td>
-                <td>
-                    <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
-                </td>
-                
-                <td>
-                    <a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a>
-                </td>
-            </tr>
-            <?php endwhile; ?>
-        </table>
-        <?php else: ?>
-        <p>No certificates found.</p>
         <?php endif; ?>
-    </main>
-    <script>
-            const burger = document.getElementById('burger');
-            const navMenu = document.getElementById('nav-menu');
+      </div>
+    </div>
 
-            // Toggle menu and burger animation
-            burger.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-                burger.classList.toggle('toggle');
-            });
+    <?php if ($result->num_rows > 0): ?>
+    <table>
+        <tr>
+            <th>User Name</th>
+            <th>Email</th>
+            <th>Control Number</th>
+            <th>Seminar Title</th>
+            <th>Certificate</th>
+            <th>Action</th>
+        </tr>
+        <?php while ($row = $result->fetch_assoc()): ?>
+        <tr>
+            <td><?= htmlspecialchars($row['name']) ?></td>
+            <td><?= htmlspecialchars($row['email']) ?></td>
+            <td><?= htmlspecialchars($row['control_number']) ?></td>
+            <td><?= htmlspecialchars($row['seminar_title']) ?></td>
+            <td><a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a></td>
+            <td><a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a></td>
+        </tr>
+        <?php endwhile; ?>
+    </table>
+    <?php else: ?>
+    <p>No certificates found.</p>
+    <?php endif; ?>
+</main>
 
-            // Close menu when a link is clicked (useful for mobile)
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.addEventListener('click', () => {
-                    navMenu.classList.remove('active');
-                    burger.classList.remove('toggle');
-                });
-            });
-        </script>
+<script>
+// Burger menu toggle
+const burger = document.getElementById('burger');
+const navMenu = document.getElementById('nav-menu');
+burger.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+    burger.classList.toggle('toggle');
+});
+document.querySelectorAll('.nav-links a').forEach(link=>{
+    link.addEventListener('click',()=>{
+        navMenu.classList.remove('active');
+        burger.classList.remove('toggle');
+    });
+});
+
+// Modal logic
+const modal = document.getElementById("uploadModal");
+const uploadBtn = document.getElementById("uploadBtn");
+const spanClose = document.getElementsByClassName("close")[0];
+
+uploadBtn.onclick = () => modal.style.display="block";
+spanClose.onclick = () => modal.style.display="none";
+window.onclick = e => { if(e.target==modal) modal.style.display="none"; }
+</script>
 
 </body>
 </html>
