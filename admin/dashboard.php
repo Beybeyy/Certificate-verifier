@@ -107,7 +107,7 @@ $result = $conn->query($sql);
 
 <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
     <h2 style="margin: 0;">Admin Dashboard - All Certificates</h2>
-    <a href="upload_certificate.php" class="upload-btn">Upload</a>
+    <a href="upload_excel.php" class="upload-btn">Upload</a>
 </div>
 
 <?php if ($result->num_rows > 0): ?>
