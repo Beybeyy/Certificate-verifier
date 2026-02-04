@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                     continue;
                 }
 
+                // Check for duplicate control number
                 $check = $conn->prepare("SELECT id FROM certificates WHERE control_number=?");
                 $check->bind_param("s", $control);
                 $check->execute();
@@ -43,19 +44,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                     continue;
                 }
 
+                // --- SAFE TEACHER ID CHECK ---
                 $stmt = $conn->prepare("SELECT id FROM users WHERE LOWER(email)=LOWER(?)");
                 $stmt->bind_param("s", $teacher_email);
                 $stmt->execute();
                 $res = $stmt->get_result();
 
-                $teacher_id = null;
-                $teacher_email_pending = null;
                 if ($res->num_rows > 0) {
                     $teacher_id = $res->fetch_assoc()['id'];
+                    $teacher_email_pending = null;
                 } else {
-                    $teacher_email_pending = $teacher_email;
+                    $teacher_id = null; // teacher not registered yet
+                    $teacher_email_pending = $teacher_email; // store pending email
                 }
 
+                // Insert certificate
                 $stmt2 = $conn->prepare("
                     INSERT INTO certificates
                     (control_number, teacher_id, teacher_email_pending, seminar_title, certificate_file)
@@ -83,11 +86,12 @@ $sql = "
     SELECT c.id AS cert_id, c.control_number, c.seminar_title, c.certificate_file, c.created_at,
            u.id AS user_id, u.name, u.email
     FROM certificates c
-    JOIN users u ON c.teacher_id = u.id
+    LEFT JOIN users u ON c.teacher_id = u.id
     ORDER BY c.created_at DESC
 ";
 $result = $conn->query($sql);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -209,7 +213,7 @@ button:hover { background:#084a6b; }
       <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Upload Certificates (CSV)</h2>
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" action="">
             <input type="file" name="csv_file" accept=".csv" required>
             <button type="submit">Upload CSV</button>
         </form>
