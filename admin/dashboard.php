@@ -103,14 +103,19 @@ $result = $conn->query($sql);
             transform: rotate(45deg) translate(-5px, -6px);
         }
 
+    .main-container{
+        margin: 0;
+    }
+
     h2 { 
         color:#0b4a82; 
-        margin-bottom: 20px; 
+        margin-top: 10px;
+        margin-bottom: 10px; 
     }
 
     /* Styling for the new Upload Button */
     .upload-btn {
-        background-color: #ff9800;
+        background-color:rgb(25, 105, 39);
         color: white;
         padding: 8px 25px;
         border-radius: 10px; /* Makes it pill-shaped like the screenshot */
@@ -239,42 +244,43 @@ $result = $conn->query($sql);
     </div>
 </nav>  
 
+    <main class="main-container">
+        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+            <h2 style="margin: 0;">Admin Dashboard - All Certificates</h2>
+            <a href="upload_excel.php" class="upload-btn">Upload</a>
+        </div>
 
-<div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
-    <h2 style="margin: 0;">Admin Dashboard - All Certificates</h2>
-    <a href="upload_excel.php" class="upload-btn">Upload</a>
-</div>
-
-<?php if ($result->num_rows > 0): ?>
-<table>
-    <tr>
-        <th>User Name</th>
-        <th>Email</th>
-        <th>Control Number</th>
-        <th>Seminar Title</th> 
-        <th>Certificate</th>
-        
-        <th>Action</th>
-    </tr>
-    <?php while ($row = $result->fetch_assoc()): ?>
-    <tr>
-        <td><?= htmlspecialchars($row['name']) ?></td>
-        <td><?= htmlspecialchars($row['email']) ?></td>
-        <td><?= htmlspecialchars($row['control_number']) ?></td>
-        <td><?= htmlspecialchars($row['seminar_title']) ?></td>
-        <td>
-            <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
-        </td>
-        
-        <td>
-            <a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a>
-        </td>
-    </tr>
-    <?php endwhile; ?>
-</table>
-<?php else: ?>
-<p>No certificates found.</p>
-<?php endif; ?>
+        <?php if ($result->num_rows > 0): ?>
+        <table>
+            <tr>
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Control Number</th>
+                <th>Seminar Title</th> 
+                <th>Certificate</th>
+                
+                <th>Action</th>
+            </tr>
+            <?php while ($row = $result->fetch_assoc()): ?>
+            <tr>
+                <td><?= htmlspecialchars($row['name']) ?></td>
+                <td><?= htmlspecialchars($row['email']) ?></td>
+                <td><?= htmlspecialchars($row['control_number']) ?></td>
+                <td><?= htmlspecialchars($row['seminar_title']) ?></td>
+                <td>
+                    <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
+                </td>
+                
+                <td>
+                    <a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a>
+                </td>
+            </tr>
+            <?php endwhile; ?>
+        </table>
+        <?php else: ?>
+        <p>No certificates found.</p>
+        <?php endif; ?>
+    </main>
     <script>
             const burger = document.getElementById('burger');
             const navMenu = document.getElementById('nav-menu');
