@@ -236,7 +236,7 @@ if (isset($_GET['control_number'])) {
                 top: 0;
                 height: 100vh;
                 width: 300px; /* Fixed width for desktop consistency */
-                background-color: #507da9; /* Matches the blue-grey in your screenshot */
+                background-color: #0b4a82; /* Matches the blue-grey in your screenshot */
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start;
