@@ -300,8 +300,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </nav>
 
 <div class="logo-container">
-    <img src="logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Logo">
-    <img src="deped-csjdm-logo.png" alt="Division Logo">
+    <img src="img/logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Logo">
+    <img src="img/deped-csjdm-logo.png" alt="Division Logo">
 </div>
 
 <main class="login-wrapper">
