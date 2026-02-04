@@ -116,8 +116,40 @@ h2 { color:#0b4a82; margin-top:0; }
 
 /* Main */
 .main-container { margin:20px; }
-.upload-btn { background:rgb(25,105,39); color:white; padding:8px 25px; border-radius:10px; font-weight:bold; font-size:14px; text-decoration:none; transition:background 0.3s; }
+.upload-btn { 
+    background: #1b5e20; /* Dark green */
+    color: white; 
+    padding: 8px 25px; 
+    border-radius: 8px; 
+    font-weight: bold; 
+    border: none;
+    cursor: pointer;
+}
 .upload-btn:hover { background:#e68a00; text-decoration:none; }
+
+/* Search Bar Container */
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-container input {
+    width: 250px;
+    padding: 8px 15px 8px 35px; /* Extra padding on left for icon */
+    border: 1px solid #1976d2;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    color: #1976d2;
+    pointer-events: none;
+    font-size: 14px;
+}
 
 /* Table */
 table { width:100%; border-collapse:collapse; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.05); }
@@ -159,10 +191,18 @@ button:hover { background:#084a6b; }
 </nav>  
 
 <main class="main-container">
-    <div style="display:flex; align-items:center; gap:20px; margin-bottom:20px;">
-        <h2>Admin Dashboard - All Certificates</h2>
-        <button id="uploadBtn" class="upload-btn">Upload</button>
-    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Admin Dashboard</h2>
+            
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="uploadBtn" class="upload-btn">Upload</button>
+                
+                <div class="search-container">
+                    <input type="text" id="certificateSearch" placeholder="Search" onkeyup="filterTable()">
+                    <span class="search-icon">🔍</span>
+                </div>
+            </div>
+        </div>
 
     <!-- Modal -->
     <div id="uploadModal" class="modal">
@@ -234,6 +274,28 @@ const spanClose = document.getElementsByClassName("close")[0];
 uploadBtn.onclick = () => modal.style.display="block";
 spanClose.onclick = () => modal.style.display="none";
 window.onclick = e => { if(e.target==modal) modal.style.display="none"; }
+
+function filterTable() {
+    const input = document.getElementById("certificateSearch");
+    const filter = input.value.toLowerCase();
+    const table = document.querySelector("table");
+    const tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows (except the header)
+    for (let i = 1; i < tr.length; i++) {
+        let match = false;
+        const tds = tr[i].getElementsByTagName("td");
+        
+        // Check Name, Email, and Control Number columns for a match
+        for (let j = 0; j < tds.length; j++) {
+            if (tds[j] && tds[j].innerText.toLowerCase().indexOf(filter) > -1) {
+                match = true;
+                break;
+            }
+        }
+        tr[i].style.display = match ? "" : "none";
+    }
+}
 </script>
 
 </body>
