@@ -24,12 +24,20 @@ $result = $conn->query($sql);
 <title>Admin Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    body { 
-        font-family: Arial, 
-        sans-serif; 
-        background:#f4f6f8; 
-        padding:20px; 
-    }
+     * {
+            box-sizing: border-box;
+        }
+
+    body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden; /* Prevents side-scrolling on mobile */
+        }
 
     /* ===== TOP NAV ===== */
     .top-nav {
@@ -67,30 +75,8 @@ $result = $conn->query($sql);
             text-decoration: underline;
         }
 
-    h2 { 
-        color:#0b4a82; 
-        margin-bottom: 20px; 
-    }
-
-    /* Styling for the new Upload Button */
-    .upload-btn {
-        background-color:rgb(30, 131, 47);
-        color: white;
-        padding: 8px 25px;
-        border-radius: 10px; /* Makes it pill-shaped like the screenshot */
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 14px;
-        transition: background 0.3s;
-    }
-
-    .upload-btn:hover {
-        background-color: #e68a00;
-        text-decoration: none;
-    }
-
-    /* ===== BURGER ICON & ANIMATION ===== */
-    .burger {
+        /* ===== BURGER ICON & ANIMATION ===== */
+       .burger {
             display: none;
             flex-direction: column;
             cursor: pointer;
@@ -116,6 +102,28 @@ $result = $conn->query($sql);
         .burger.toggle span:nth-child(3) {
             transform: rotate(45deg) translate(-5px, -6px);
         }
+
+    h2 { 
+        color:#0b4a82; 
+        margin-bottom: 20px; 
+    }
+
+    /* Styling for the new Upload Button */
+    .upload-btn {
+        background-color: #ff9800;
+        color: white;
+        padding: 8px 25px;
+        border-radius: 10px; /* Makes it pill-shaped like the screenshot */
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+        transition: background 0.3s;
+    }
+
+    .upload-btn:hover {
+        background-color: #e68a00;
+        text-decoration: none;
+    }
     
     table { 
         width:100%; 
@@ -159,13 +167,19 @@ $result = $conn->query($sql);
         border-radius:5px; 
     }
     .edit-btn:hover { 
-        background:#f57c00;
+        background:#f57c00; 
     }
-        
-        /* ===== MOBILE RESPONSIVE LOGIC ===== */
-        @media (max-width: 768px) {
+
+    /* ===== MOBILE RESPONSIVE LOGIC ===== */
+        /*@media (max-width: 768px) {
             .top-nav {
                 padding: 15px 20px;
+            }*/
+
+            @media (max-width: 480px) {
+                .nav-links {
+                    width: 70%; /* Takes up more space on small phones */
+                }
             }
 
             .burger {
@@ -174,106 +188,111 @@ $result = $conn->query($sql);
 
             .nav-links {
                 position: fixed;
-                right: -100%; /* Hidden off-screen to the right */
+                right: -100%; /* Hidden off-screen by default */
                 top: 0;
                 height: 100vh;
-                width: 30%; /* Menu takes 70% of screen width */
-                background-color: #0b4a82;
+                width: 190px; /* Fixed width for desktop consistency */
+                background-color: #0b4a82; /* Matches the blue-grey in your screenshot */
+                display: flex;
                 flex-direction: column;
-                justify-content: center;
-                gap: 30px;
+                justify-content: flex-start;
+                padding-top: 80px; 
+                gap: 0;
+                transition: 0.3s ease-in-out;
                 box-shadow: -5px 0 15px rgba(0,0,0,0.2);
             }
 
             .nav-links.active {
-                right: 0; /* Slide in */
+                right: 0;
             }
 
             .nav-links a {
                 margin: 0;
-                font-size: 20px;
+                padding: 20px 30px;
                 width: 100%;
-                text-align: center;
+                text-align: left;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                font-size: 18px;
             }
-    }
+
 </style>
 </head>
 <body>
-    <nav class="top-nav">
-        <div class="nav-brand">
-            Department of Education<br>
-            Certificate Verifier
-        </div>
+  <!-- TOP NAV -->
+<nav class="top-nav">
+    <div class="nav-brand">
+        Department of Education<br>
+        Certificate Verifier
+    </div>
 
-        <div class="burger" id="burger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+    <div class="burger" id="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
 
-        <div class="nav-links" id="nav-menu">
-            <a href="#">Dashboard</a>
-            <a href="#">About</a>
-            <a href="#">Contact</a>
-            <a href="../login.php">➜] Logout</a>
-        </div>
-    </nav>
+    <div class="nav-links" id="nav-menu">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="../login.php">➜] Logout</a>
+    </div>
+</nav>  
 
 
-            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
-                <h2 style="margin: 0;">Admin Dashboard - All Certificates</h2>
-                <a href="upload_excel.php" class="upload-btn">Upload</a>
-            </div>
+<div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+    <h2 style="margin: 0;">Admin Dashboard - All Certificates</h2>
+    <a href="upload_excel.php" class="upload-btn">Upload</a>
+</div>
 
-            <?php if ($result->num_rows > 0): ?>
-            <table>
-                <tr>
-                    <th>User Name</th>
-                    <th>Email</th>
-                    <th>Control Number</th>
-                    <th>Seminar Title</th> 
-                    <th>Certificate</th>
-                    <th>Date Issued</th>
-                    <th>Action</th>
-                </tr>
-                <?php while ($row = $result->fetch_assoc()): ?>
-                <tr>
-                    <td><?= htmlspecialchars($row['name']) ?></td>
-                    <td><?= htmlspecialchars($row['email']) ?></td>
-                    <td><?= htmlspecialchars($row['control_number']) ?></td>
-                    <td><?= htmlspecialchars($row['seminar_title']) ?></td>
-                    <td>
-                        <a href="../uploads/certificates/<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View PDF</a>
-                    </td>
-                    <td><?= htmlspecialchars($row['created_at']) ?></td>
-                    <td>
-                        <a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a>
-                    </td>
-                </tr>
-                <?php endwhile; ?>
-            </table>
-            <?php else: ?>
-            <p>No certificates found.</p>
-            <?php endif; ?>
-
+<?php if ($result->num_rows > 0): ?>
+<table>
+    <tr>
+        <th>User Name</th>
+        <th>Email</th>
+        <th>Control Number</th>
+        <th>Seminar Title</th> 
+        <th>Certificate</th>
+        
+        <th>Action</th>
+    </tr>
+    <?php while ($row = $result->fetch_assoc()): ?>
+    <tr>
+        <td><?= htmlspecialchars($row['name']) ?></td>
+        <td><?= htmlspecialchars($row['email']) ?></td>
+        <td><?= htmlspecialchars($row['control_number']) ?></td>
+        <td><?= htmlspecialchars($row['seminar_title']) ?></td>
+        <td>
+            <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
+        </td>
+        
+        <td>
+            <a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a>
+        </td>
+    </tr>
+    <?php endwhile; ?>
+</table>
+<?php else: ?>
+<p>No certificates found.</p>
+<?php endif; ?>
     <script>
-        const burger = document.getElementById('burger');
-        const navMenu = document.getElementById('nav-menu');
+            const burger = document.getElementById('burger');
+            const navMenu = document.getElementById('nav-menu');
 
-        // Toggle menu and burger animation
-        burger.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            burger.classList.toggle('toggle');
-        });
-
-        // Close menu when a link is clicked (useful for mobile)
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('active');
-                burger.classList.remove('toggle');
+            // Toggle menu and burger animation
+            burger.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                burger.classList.toggle('toggle');
             });
-        });
-    </script>
+
+            // Close menu when a link is clicked (useful for mobile)
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('active');
+                    burger.classList.remove('toggle');
+                });
+            });
+        </script>
 
 </body>
 </html>
