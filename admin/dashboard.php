@@ -232,19 +232,19 @@ button:hover { background:#084a6b; }
     <?php if ($result->num_rows > 0): ?>
     <table>
         <tr>
-            <th>User Name</th>
-            <th>Email</th>
             <th>Control Number</th>
-            <th>Seminar Title</th>
+            <th>Name</th>
+            <th>Seminar/Workshop Attended</th>
+            <th>Email</th>
             <th>Certificate</th>
             <th>Action</th>
         </tr>
         <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
-            <td><?= htmlspecialchars($row['name']) ?></td>
-            <td><?= htmlspecialchars($row['email']) ?></td>
             <td><?= htmlspecialchars($row['control_number']) ?></td>
+            <td><?= htmlspecialchars($row['name']) ?></td>
             <td><?= htmlspecialchars($row['seminar_title']) ?></td>
+            <td><?= htmlspecialchars($row['email']) ?></td>
             <td><a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a></td>
             <td><a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a></td>
         </tr>
