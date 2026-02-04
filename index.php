@@ -88,9 +88,25 @@ if (isset($_GET['control_number'])) {
             text-decoration: underline;
         }
 
-        /* ===== BURGER ICON & ANIMATION ===== */
-        .burger {
-            display: flex; /* Changed from 'none' to 'flex' */
+        /* ===== LOGO SECTION ===== */
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 30px 10px 10px 10px; /* Spacing between nav and login card */
+        }
+
+        .logo-container img {
+            height: 100px; /* Adjust size to match your images */
+            width: auto;
+            object-fit: contain;
+        }
+
+
+       /* ===== BURGER ICON & ANIMATION ===== */
+       .burger {
+            display: none;
             flex-direction: column;
             cursor: pointer;
             gap: 5px;
@@ -219,8 +235,8 @@ if (isset($_GET['control_number'])) {
                 right: -100%; /* Hidden off-screen by default */
                 top: 0;
                 height: 100vh;
-                width: 180px; /* Fixed width for desktop consistency */
-                background-color: #0b4a82;
+                width: 300px; /* Fixed width for desktop consistency */
+                background-color: #507da9; /* Matches the blue-grey in your screenshot */
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start;
@@ -242,7 +258,7 @@ if (isset($_GET['control_number'])) {
                 border-bottom: 1px solid rgba(255,255,255,0.1);
                 font-size: 18px;
             }
-            
+        
     </style>
 </head>
 <body>
@@ -261,11 +277,17 @@ if (isset($_GET['control_number'])) {
     </div>
 
     <div class="nav-links" id="nav-menu">
-        <a href="about.php">About</a>
-        <a href="contact.php">Contact</a>
-        <!-- <a href="login.php" class="logout-link">Logout</a> -->
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
     </div>
 </nav>
+
+<div class="logo-container">
+    <img src="img/logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Logo">
+    <img src="img/deped-csjdm-logo.png" alt="Division Logo">
+</div>
+
 
 <!-- CENTER CONTENT -->
 <div class="page-wrapper">
@@ -309,30 +331,21 @@ if (isset($_GET['control_number'])) {
 
         <script>
             const burger = document.getElementById('burger');
-            const navMenu = document.getElementById('nav-menu');
+    const navMenu = document.getElementById('nav-menu');
 
-            // Toggle menu
-            burger.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent immediate closing
-                navMenu.classList.toggle('active');
-                burger.classList.toggle('toggle');
-            });
+    // Toggle menu and burger animation
+    burger.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+        burger.classList.toggle('toggle');
+    });
 
-            // Close menu when clicking a link
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.addEventListener('click', () => {
-                    navMenu.classList.remove('active');
-                    burger.classList.remove('toggle');
-                });
-            });
-
-            // Close menu if clicking outside of the menu
-            document.addEventListener('click', (e) => {
-                if (!navMenu.contains(e.target) && !burger.contains(e.target)) {
-                    navMenu.classList.remove('active');
-                    burger.classList.remove('toggle');
-                }
-            });
+    // Close menu when a link is clicked (useful for mobile)
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+            burger.classList.remove('toggle');
+        });
+    });
         </script>
 
 </body>

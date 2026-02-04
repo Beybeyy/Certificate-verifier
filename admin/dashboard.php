@@ -31,6 +31,42 @@ $result = $conn->query($sql);
         padding:20px; 
     }
 
+    /* ===== TOP NAV ===== */
+    .top-nav {
+            background-color: #0b4a82;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #ffffff;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            font-size: 18px;
+            line-height: 1.2;
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            transition: 0.3s ease-in-out;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 35px;
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
     h2 { 
         color:#0b4a82; 
         margin-bottom: 20px; 
@@ -38,7 +74,7 @@ $result = $conn->query($sql);
 
     /* Styling for the new Upload Button */
     .upload-btn {
-        background-color: #ff9800;
+        background-color:rgb(30, 131, 47);
         color: white;
         padding: 8px 25px;
         border-radius: 10px; /* Makes it pill-shaped like the screenshot */
@@ -52,6 +88,34 @@ $result = $conn->query($sql);
         background-color: #e68a00;
         text-decoration: none;
     }
+
+    /* ===== BURGER ICON & ANIMATION ===== */
+    .burger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+            z-index: 1001;
+        }
+
+        .burger span {
+            height: 3px;
+            width: 28px;
+            background: white;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        /* Animation to transform burger into 'X' */
+        .burger.toggle span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        .burger.toggle span:nth-child(2) {
+            opacity: 0;
+        }
+        .burger.toggle span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
     
     table { 
         width:100%; 
@@ -95,51 +159,121 @@ $result = $conn->query($sql);
         border-radius:5px; 
     }
     .edit-btn:hover { 
-        background:#f57c00; 
+        background:#f57c00;
+    }
+        
+        /* ===== MOBILE RESPONSIVE LOGIC ===== */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 15px 20px;
+            }
+
+            .burger {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                right: -100%; /* Hidden off-screen to the right */
+                top: 0;
+                height: 100vh;
+                width: 30%; /* Menu takes 70% of screen width */
+                background-color: #0b4a82;
+                flex-direction: column;
+                justify-content: center;
+                gap: 30px;
+                box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+            }
+
+            .nav-links.active {
+                right: 0; /* Slide in */
+            }
+
+            .nav-links a {
+                margin: 0;
+                font-size: 20px;
+                width: 100%;
+                text-align: center;
+            }
     }
 </style>
 </head>
 <body>
+    <nav class="top-nav">
+        <div class="nav-brand">
+            Department of Education<br>
+            Certificate Verifier
+        </div>
 
-<div class="logout">
-    <a href="../login.php">➜] Logout</a>
-</div>
+        <div class="burger" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
 
-<div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
-    <h2 style="margin: 0;">Admin Dashboard - All Certificates</h2>
-    <a href="upload_excel.php" class="upload-btn">Upload</a>
-</div>
+        <div class="nav-links" id="nav-menu">
+            <a href="#">Dashboard</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="../login.php">➜] Logout</a>
+        </div>
+    </nav>
 
-<?php if ($result->num_rows > 0): ?>
-<table>
-    <tr>
-        <th>User Name</th>
-        <th>Email</th>
-        <th>Control Number</th>
-        <th>Seminar Title</th> 
-        <th>Certificate</th>
-        
-        <th>Action</th>
-    </tr>
-    <?php while ($row = $result->fetch_assoc()): ?>
-    <tr>
-        <td><?= htmlspecialchars($row['name']) ?></td>
-        <td><?= htmlspecialchars($row['email']) ?></td>
-        <td><?= htmlspecialchars($row['control_number']) ?></td>
-        <td><?= htmlspecialchars($row['seminar_title']) ?></td>
-        <td>
-            <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
-        </td>
-        
-        <td>
-            <a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a>
-        </td>
-    </tr>
-    <?php endwhile; ?>
-</table>
-<?php else: ?>
-<p>No certificates found.</p>
-<?php endif; ?>
+
+            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                <h2 style="margin: 0;">Admin Dashboard - All Certificates</h2>
+                <a href="upload_excel.php" class="upload-btn">Upload</a>
+            </div>
+
+            <?php if ($result->num_rows > 0): ?>
+            <table>
+                <tr>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Control Number</th>
+                    <th>Seminar Title</th> 
+                    <th>Certificate</th>
+                    <th>Date Issued</th>
+                    <th>Action</th>
+                </tr>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['name']) ?></td>
+                    <td><?= htmlspecialchars($row['email']) ?></td>
+                    <td><?= htmlspecialchars($row['control_number']) ?></td>
+                    <td><?= htmlspecialchars($row['seminar_title']) ?></td>
+                    <td>
+                        <a href="../uploads/certificates/<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View PDF</a>
+                    </td>
+                    <td><?= htmlspecialchars($row['created_at']) ?></td>
+                    <td>
+                        <a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a>
+                    </td>
+                </tr>
+                <?php endwhile; ?>
+            </table>
+            <?php else: ?>
+            <p>No certificates found.</p>
+            <?php endif; ?>
+
+    <script>
+        const burger = document.getElementById('burger');
+        const navMenu = document.getElementById('nav-menu');
+
+        // Toggle menu and burger animation
+        burger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            burger.classList.toggle('toggle');
+        });
+
+        // Close menu when a link is clicked (useful for mobile)
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                burger.classList.remove('toggle');
+            });
+        });
+    </script>
 
 </body>
 </html>

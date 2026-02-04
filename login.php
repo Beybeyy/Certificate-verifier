@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .logo-container img {
-            height: 60px; /* Adjust size to match your images */
+            height: 100px; /* Adjust size to match your images */
             width: auto;
             object-fit: contain;
         }
@@ -242,10 +242,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 5px;
         }
 
-        /* ===== MOBILE RESPONSIVE LOGIC ===== */
-        @media (max-width: 768px) {
+       /* ===== MOBILE RESPONSIVE LOGIC ===== */
+        /*@media (max-width: 768px) {
             .top-nav {
                 padding: 15px 20px;
+            }*/
+
+            @media (max-width: 480px) {
+                .nav-links {
+                    width: 70%; /* Takes up more space on small phones */
+                }
             }
 
             .burger {
@@ -254,28 +260,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             .nav-links {
                 position: fixed;
-                right: -100%; /* Hidden off-screen to the right */
+                right: -100%; /* Hidden off-screen by default */
                 top: 0;
                 height: 100vh;
-                width: 30%; /* Menu takes 70% of screen width */
-                background-color: #0b4a82;
+                width: 300px; /* Fixed width for desktop consistency */
+                background-color: #507da9; /* Matches the blue-grey in your screenshot */
+                display: flex;
                 flex-direction: column;
-                justify-content: center;
-                gap: 30px;
+                justify-content: flex-start;
+                padding-top: 80px; 
+                gap: 0;
+                transition: 0.3s ease-in-out;
                 box-shadow: -5px 0 15px rgba(0,0,0,0.2);
             }
 
             .nav-links.active {
-                right: 0; /* Slide in */
+                right: 0;
             }
 
             .nav-links a {
                 margin: 0;
-                font-size: 20px;
+                padding: 20px 30px;
                 width: 100%;
-                text-align: center;
+                text-align: left;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                font-size: 18px;
             }
-        }
+        
     </style>
 </head>
 <body>
