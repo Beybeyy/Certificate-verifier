@@ -219,8 +219,8 @@ if (isset($_GET['control_number'])) {
                 right: -100%; /* Hidden off-screen by default */
                 top: 0;
                 height: 100vh;
-                width: 300px; /* Fixed width for desktop consistency */
-                background-color: #507da9; /* Matches the blue-grey in your screenshot */
+                width: 180px; /* Fixed width for desktop consistency */
+                background-color: #0b4a82;
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start;
@@ -261,9 +261,9 @@ if (isset($_GET['control_number'])) {
     </div>
 
     <div class="nav-links" id="nav-menu">
-        <a href="#">About</a>
-        <a href="#">Contact</a>
-        <a href="login.php" class="logout-link">Logout</a>
+        <a href="about.php">About</a>
+        <a href="contact.php">Contact</a>
+        <!-- <a href="login.php" class="logout-link">Logout</a> -->
     </div>
 </nav>
 
