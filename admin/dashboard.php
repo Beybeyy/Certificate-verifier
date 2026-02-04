@@ -41,7 +41,7 @@ $result = $conn->query($sql);
         background-color: #ff9800;
         color: white;
         padding: 8px 25px;
-        border-radius: 20px; /* Makes it pill-shaped like the screenshot */
+        border-radius: 5px; /* Makes it pill-shaped like the screenshot */
         text-decoration: none;
         font-weight: bold;
         font-size: 14px;
@@ -102,7 +102,7 @@ $result = $conn->query($sql);
 <body>
 
 <div class="logout">
-    <a href="../login.php">➜]</a>
+    <a href="../login.php">➜]Logout</a>
 </div>
 
 <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
