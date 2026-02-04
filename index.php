@@ -90,7 +90,7 @@ if (isset($_GET['control_number'])) {
 
         /* ===== BURGER ICON & ANIMATION ===== */
         .burger {
-            display: none;
+            display: flex; /* Changed from 'none' to 'flex' */
             flex-direction: column;
             cursor: pointer;
             gap: 5px;
@@ -199,9 +199,15 @@ if (isset($_GET['control_number'])) {
         }
 
         /* ===== MOBILE RESPONSIVE LOGIC ===== */
-        @media (max-width: 768px) {
+        /*@media (max-width: 768px) {
             .top-nav {
                 padding: 15px 20px;
+            }*/
+
+            @media (max-width: 480px) {
+                .nav-links {
+                    width: 70%; /* Takes up more space on small phones */
+                }
             }
 
             .burger {
@@ -210,28 +216,33 @@ if (isset($_GET['control_number'])) {
 
             .nav-links {
                 position: fixed;
-                right: -100%; /* Hidden off-screen to the right */
+                right: -100%; /* Hidden off-screen by default */
                 top: 0;
                 height: 100vh;
-                width: 30%; /* Menu takes 70% of screen width */
-                background-color: #0b4a82;
+                width: 300px; /* Fixed width for desktop consistency */
+                background-color: #507da9; /* Matches the blue-grey in your screenshot */
+                display: flex;
                 flex-direction: column;
-                justify-content: center;
-                gap: 30px;
+                justify-content: flex-start;
+                padding-top: 80px; 
+                gap: 0;
+                transition: 0.3s ease-in-out;
                 box-shadow: -5px 0 15px rgba(0,0,0,0.2);
             }
 
             .nav-links.active {
-                right: 0; /* Slide in */
+                right: 0;
             }
 
             .nav-links a {
                 margin: 0;
-                font-size: 20px;
+                padding: 20px 30px;
                 width: 100%;
-                text-align: center;
+                text-align: left;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                font-size: 18px;
             }
-        }
+            
     </style>
 </head>
 <body>
@@ -250,9 +261,9 @@ if (isset($_GET['control_number'])) {
     </div>
 
     <div class="nav-links" id="nav-menu">
-        <a href="#">Home</a>
         <a href="#">About</a>
         <a href="#">Contact</a>
+        <a href="login.php" class="logout-link">Logout</a>
     </div>
 </nav>
 
@@ -300,18 +311,27 @@ if (isset($_GET['control_number'])) {
             const burger = document.getElementById('burger');
             const navMenu = document.getElementById('nav-menu');
 
-            // Toggle menu and burger animation
-            burger.addEventListener('click', () => {
+            // Toggle menu
+            burger.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent immediate closing
                 navMenu.classList.toggle('active');
                 burger.classList.toggle('toggle');
             });
 
-            // Close menu when a link is clicked (useful for mobile)
+            // Close menu when clicking a link
             document.querySelectorAll('.nav-links a').forEach(link => {
                 link.addEventListener('click', () => {
                     navMenu.classList.remove('active');
                     burger.classList.remove('toggle');
                 });
+            });
+
+            // Close menu if clicking outside of the menu
+            document.addEventListener('click', (e) => {
+                if (!navMenu.contains(e.target) && !burger.contains(e.target)) {
+                    navMenu.classList.remove('active');
+                    burger.classList.remove('toggle');
+                }
             });
         </script>
 
