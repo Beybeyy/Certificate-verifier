@@ -118,7 +118,7 @@ $result = $conn->query($sql);
         <th>Control Number</th>
         <th>Seminar Title</th> 
         <th>Certificate</th>
-        <th>Date Issued</th>
+        
         <th>Action</th>
     </tr>
     <?php while ($row = $result->fetch_assoc()): ?>
@@ -128,9 +128,9 @@ $result = $conn->query($sql);
         <td><?= htmlspecialchars($row['control_number']) ?></td>
         <td><?= htmlspecialchars($row['seminar_title']) ?></td>
         <td>
-            <a href="../uploads/certificates/<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View PDF</a>
+            <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
         </td>
-        <td><?= htmlspecialchars($row['created_at']) ?></td>
+        
         <td>
             <a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a>
         </td>

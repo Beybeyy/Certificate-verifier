@@ -118,14 +118,14 @@ $certificates = $stmt2->get_result();
         <th>Control Number</th>
         <th>Seminar Title</th>
         <th>Certificate</th>
-        <th>Date Issued</th>
+        
     </tr>
     <?php while ($row = $certificates->fetch_assoc()): ?>
     <tr>
         <td><?= htmlspecialchars($row['control_number']) ?></td>
         <td><?= htmlspecialchars($row['seminar_title']) ?></td>
         <td><a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a></td>
-        <td><?= htmlspecialchars($row['created_at']) ?></td>
+        
     </tr>
     <?php endwhile; ?>
 </table>
