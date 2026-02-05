@@ -17,14 +17,14 @@ $stmt->bind_param("i", $teacher_id);
 $stmt->execute();
 $teacher = $stmt->get_result()->fetch_assoc();
 
-// Fetch teacher certificates
+// Fetch teacher certificates (including certificates uploaded before registration)
 $stmt2 = $conn->prepare("
     SELECT control_number, seminar_title, certificate_file, created_at
     FROM certificates
-    WHERE teacher_id = ?
+    WHERE teacher_id = ? OR teacher_email_pending = ?
     ORDER BY created_at DESC
 ");
-$stmt2->bind_param("i", $teacher_id);
+$stmt2->bind_param("is", $teacher_id, $teacher['email']);
 $stmt2->execute();
 $certificates = $stmt2->get_result();
 ?>
@@ -100,9 +100,19 @@ $certificates = $stmt2->get_result();
 <body>
 
 <div class="header">
-    <h2>Welcome, <?= htmlspecialchars($teacher['name']) ?></h2>
+            <h2>
+        Welcome, 
+        <?php
+        if (!empty($teacher['name'])) {
+            echo htmlspecialchars($teacher['name']);
+        } else {
+            // fallback: show part of email before @
+            echo htmlspecialchars(explode('@', $teacher['email'])[0]);
+        }
+        ?>
+</h2>
     <div class="logout">
-        <a href="http://10.10.8.218:8080/Certificate-verifier/login.php">Logout</a>
+        <a href="/../login.php>Logout</a>
     </div>
 </div>
 
