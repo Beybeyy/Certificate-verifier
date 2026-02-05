@@ -119,7 +119,7 @@ a.view-pdf:hover { text-decoration: underline; }
             ?>
         </h2>
         <div class="logout">
-            <a href="/../login.php">Logout</a>
+            <a href="../login.php">Logout</a>
         </div>
     </div>
 
