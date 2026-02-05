@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . "/config/db.php";
+// require_once __DIR__ . "/config/db.php";
 
 $result = null;
 $error = "";
@@ -149,10 +149,11 @@ if (isset($_GET['control_number'])) {
         /* ===== PAGE CENTER ===== */
         .page-wrapper {
             display: flex;
-            justify-content: center; /* Centers horizontally */
-            align-items: flex-start; /* Keeps it near the top/logos */
-            padding: 20px; 
-            flex: 1; /* Allow it to take up remaining vertical space */
+            flex-direction: column; /* Stack vertically if needed, but here we use it to center */
+            align-items: center;
+            justify-content: flex-start; /* Keeps content from floating too low */
+            flex: 1;
+            padding: 0 20px 40px;
         }
 
         /* Optional: Improve Error/Result visibility */
@@ -301,9 +302,14 @@ if (isset($_GET['control_number'])) {
             /* Ensure the card fits the screen width */
             .card {
                 width: 100%;
-                max-width: 100%;
-                padding: 25px 20px; /* Reduce internal padding */
-                border-radius: 12px;
+                max-width: 650px; /* Slightly wider to match your image */
+                margin: 0 auto;   /* Perfect horizontal centering */
+                padding: 50px 40px;
+                border: 1px solid #0b4a82; /* Thin blue border from image */
+                border-radius: 30px; /* Rounded corners from image */
+                text-align: center;
+                background: #ffffff;
+                box-shadow: none; /* Keep it flat and clean like the image */
             }
 
             /* Adjust search row for small screens */
