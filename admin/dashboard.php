@@ -208,6 +208,19 @@ th, td { padding:12px 15px; border:1px solid #ddd; text-align:center; }
 th { background:#1976d2; color:#fff; }
 tr:nth-child(even){ background:#f9f9f9; }
 tr:hover{ background:#e3f2fd; }
+
+/* PASTE THE PAGINATION FOOTER CSS HERE */
+.pagination-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f1f8ff; /* Light blue from image */
+    border: 1px solid #ddd;
+    border-top: none; /* Merges with the table bottom */
+    font-size: 14px;
+}
+
 a { color:#0b4a82; font-weight:bold; text-decoration:none; }
 a:hover { text-decoration:underline; }
 .edit-btn { background:#ff9800; color:#fff; padding:5px 10px; border-radius:5px; }
@@ -309,6 +322,37 @@ button:hover { background:#084a6b; }
         </tr>
         <?php endwhile; ?>
     </table>
+
+    <div class="pagination-footer">
+        <div class="footer-left">
+            Showing <span id="start-row">1</span> to <span id="end-row">20</span> of <span id="total-rows">50</span> teachers
+        </div>
+        
+        <div class="footer-right">
+            <div class="row-select-wrapper">
+                Row per page: 
+                <select id="rowPerPage" onchange="changeRowsPerPage()">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30" selected>30</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+
+            <div class="pagination-controls">
+                <button class="page-arrow" onclick="prevPage()">❮</button>
+                <div id="page-numbers">
+                    <button class="page-num active">1</button>
+                    <button class="page-num">2</button>
+                    <button class="page-num">3</button>
+                    <button class="page-num">4</button>
+                    <button class="page-num">5</button>
+                </div>
+                <button class="page-arrow" onclick="nextPage()">❯</button>
+            </div>
+        </div>
+    </div>
+
     <?php else: ?>
     <p>No certificates found.</p>
     <?php endif; ?>
@@ -381,6 +425,11 @@ function editName(btn, certId) {
             btn.innerText = 'Edit';
         });
     }
+}
+
+let currentPage = 1;
+function updatePaginationUI(page) {
+    // ... logic ...
 }
 </script>
 
