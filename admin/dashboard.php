@@ -8,14 +8,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_name'])) {
     $new_name = trim($_POST['name']);
 
     if ($new_name !== '') {
-        $stmt = $conn->prepare("
-            UPDATE users u
-            JOIN certificates c ON c.teacher_id = u.id
-            SET u.name = ?
-            WHERE c.id = ?
-        ");
-        $stmt->bind_param("si", $new_name, $cert_id);
+        // Check if certificate has a registered user
+        $stmt = $conn->prepare("SELECT teacher_id FROM certificates WHERE id=?");
+        $stmt->bind_param("i", $cert_id);
         $stmt->execute();
+        $res = $stmt->get_result()->fetch_assoc();
+
+        if ($res['teacher_id']) {
+            // Registered user → update users.name
+            $stmt = $conn->prepare("UPDATE users SET name=? WHERE id=?");
+            $stmt->bind_param("si", $new_name, $res['teacher_id']);
+            $stmt->execute();
+        } else {
+            // Not registered → update certificates.temp_name
+            $stmt = $conn->prepare("UPDATE certificates SET temp_name=? WHERE id=?");
+            $stmt->bind_param("si", $new_name, $cert_id);
+            $stmt->execute();
+        }
     }
     exit;
 }
@@ -118,14 +127,13 @@ $sql = "
 
         u.id AS user_id,
         u.name AS user_name,
+        c.temp_name AS temp_name,          -- add this
 
         COALESCE(u.email, c.teacher_email_pending) AS display_email
-
     FROM certificates c
     LEFT JOIN users u 
         ON c.teacher_id = u.id
         OR LOWER(c.teacher_email_pending) = LOWER(u.email)
-
     ORDER BY c.created_at DESC
 ";
 
@@ -283,21 +291,14 @@ button:hover { background:#084a6b; }
             <td><?= htmlspecialchars($row['control_number']) ?></td>
             <td>
                 <span class="name-text">
-                    <?php
-                    if (!empty($row['display_email'])) {
-                        echo htmlspecialchars(explode('@', $row['display_email'])[0]);
-                    } else {
-                        echo 'Not registered';
-                    }
-                    ?>
+                    <?= htmlspecialchars($row['temp_name'] ?? $row['user_name'] ?? explode('@', $row['display_email'])[0] ?? 'Not registered') ?>
                 </span>
 
                 <input type="text"
                     class="name-input"
-                    value="<?= !empty($row['display_email']) 
-                            ? htmlspecialchars(explode('@', $row['display_email'])[0]) 
-                            : '' ?>"
+                    value="<?= htmlspecialchars($row['temp_name'] ?? $row['user_name'] ?? explode('@', $row['display_email'])[0] ?? '') ?>"
                     style="display:none; width:120px;">
+
             </td>
             <td><?= htmlspecialchars($row['seminar_title']) ?></td>
             <td><?= htmlspecialchars($row['display_email'] ?? '') ?></td>
