@@ -384,11 +384,6 @@ button:hover { background:#084a6b; }
         <?php endwhile; ?>
     </table>
 
-    <div class="pagination-footer">
-        <div class="footer-left">
-            Showing <span id="start-row">1</span> to <span id="end-row">20</span> of <span id="total-rows">50</span> teachers
-        </div>
-        
         <div class="pagination-footer">
             <div class="footer-left">
                 Showing <b>1</b> to <b>20</b> of <b>50</b> teachers
