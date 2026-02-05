@@ -1,6 +1,25 @@
 <?php
 session_start();
 require_once __DIR__ . "/../config/db.php";
+ 
+ /* ===== INLINE NAME UPDATE ===== */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_name'])) {
+    $cert_id = (int)$_POST['id'];
+    $new_name = trim($_POST['name']);
+
+    if ($new_name !== '') {
+        $stmt = $conn->prepare("
+            UPDATE users u
+            JOIN certificates c ON c.teacher_id = u.id
+            SET u.name = ?
+            WHERE c.id = ?
+        ");
+        $stmt->bind_param("si", $new_name, $cert_id);
+        $stmt->execute();
+    }
+    exit;
+}
+
 
 /* ===== ADMIN CHECK ===== */
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
@@ -263,18 +282,29 @@ button:hover { background:#084a6b; }
         <tr>
             <td><?= htmlspecialchars($row['control_number']) ?></td>
             <td>
-                <?php
-                if (!empty($row['display_email'])) {
-                    echo htmlspecialchars(explode('@', $row['display_email'])[0]);
-                } else {
-                    echo 'Not registered';
-                }
-                ?>
+                <span class="name-text">
+                    <?php
+                    if (!empty($row['display_email'])) {
+                        echo htmlspecialchars(explode('@', $row['display_email'])[0]);
+                    } else {
+                        echo 'Not registered';
+                    }
+                    ?>
+                </span>
+
+                <input type="text"
+                    class="name-input"
+                    value="<?= !empty($row['display_email']) 
+                            ? htmlspecialchars(explode('@', $row['display_email'])[0]) 
+                            : '' ?>"
+                    style="display:none; width:120px;">
             </td>
             <td><?= htmlspecialchars($row['seminar_title']) ?></td>
             <td><?= htmlspecialchars($row['display_email'] ?? '') ?></td>
             <td><a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a></td>
-            <td><a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a></td>
+            <td><button class="edit-btn" onclick="editName(this, <?= $row['cert_id'] ?>)">
+               Edit
+             </button></td>
         </tr>
         <?php endwhile; ?>
     </table>
@@ -326,6 +356,29 @@ function filterTable() {
             }
         }
         tr[i].style.display = match ? "" : "none";
+    }
+}
+function editName(btn, certId) {
+    const row = btn.closest('tr');
+    const text = row.querySelector('.name-text');
+    const input = row.querySelector('.name-input');
+
+    if (btn.innerText === 'Edit') {
+        text.style.display = 'none';
+        input.style.display = 'inline-block';
+        input.focus();
+        btn.innerText = 'Save';
+    } else {
+        fetch('', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `update_name=1&id=${certId}&name=${encodeURIComponent(input.value)}`
+        }).then(() => {
+            text.innerText = input.value || 'Not registered';
+            text.style.display = 'inline';
+            input.style.display = 'none';
+            btn.innerText = 'Edit';
+        });
     }
 }
 </script>
