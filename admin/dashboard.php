@@ -2,13 +2,15 @@
 session_start();
 require_once __DIR__ . "/../config/db.php";
 
+/* ===== ADMIN CHECK ===== */
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
 }
 
-// Handle CSV Upload
+/* ===== HANDLE CSV UPLOAD ===== */
 $messages = [];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 
     if ($_FILES['csv_file']['error'] !== 0) {
@@ -19,32 +21,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
         if (!$file) {
             $messages[] = "❌ Failed to open CSV file.";
         } else {
+
             fgetcsv($file); // skip header
             $inserted = 0;
-            $skipped = 0;
+            $skipped  = 0;
 
             while (($row = fgetcsv($file)) !== false) {
+
                 if (count(array_filter($row)) === 0) continue;
 
                 [$control, $teacher_email, $title, $certificate_file] = array_map('trim', $row);
 
                 if (!$control || !$teacher_email || !$title || !$certificate_file) {
-                    $messages[] = "Skipped row: missing field(s)";
                     $skipped++;
                     continue;
                 }
 
-                // Check for duplicate control number
+                // Check duplicate control number
                 $check = $conn->prepare("SELECT id FROM certificates WHERE control_number=?");
                 $check->bind_param("s", $control);
                 $check->execute();
                 if ($check->get_result()->num_rows > 0) {
-                    $messages[] = "Skipped row '$control': control number exists";
                     $skipped++;
                     continue;
                 }
 
-                // --- SAFE TEACHER ID CHECK ---
+                // Check if teacher exists
                 $stmt = $conn->prepare("SELECT id FROM users WHERE LOWER(email)=LOWER(?)");
                 $stmt->bind_param("s", $teacher_email);
                 $stmt->execute();
@@ -54,44 +56,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                     $teacher_id = $res->fetch_assoc()['id'];
                     $teacher_email_pending = null;
                 } else {
-                    $teacher_id = null; // teacher not registered yet
-                    $teacher_email_pending = $teacher_email; // store pending email
+                    $teacher_id = null;
+                    $teacher_email_pending = $teacher_email;
                 }
 
                 // Insert certificate
-                $stmt2 = $conn->prepare("
-                    INSERT INTO certificates
+                $insert = $conn->prepare("
+                    INSERT INTO certificates 
                     (control_number, teacher_id, teacher_email_pending, seminar_title, certificate_file)
                     VALUES (?, ?, ?, ?, ?)
                 ");
-                $stmt2->bind_param("sisss", $control, $teacher_id, $teacher_email_pending, $title, $certificate_file);
+                $insert->bind_param(
+                    "sisss",
+                    $control,
+                    $teacher_id,
+                    $teacher_email_pending,
+                    $title,
+                    $certificate_file
+                );
 
-                if ($stmt2->execute()) {
-                    $messages[] = "Inserted row '$control' successfully";
+                if ($insert->execute()) {
                     $inserted++;
                 } else {
-                    $messages[] = "Skipped row '$control': failed to insert";
                     $skipped++;
                 }
             }
 
             fclose($file);
-            $messages[] = "✅ Total inserted: $inserted | ❌ Total skipped: $skipped";
+            $messages[] = "✅ Inserted: $inserted | ❌ Skipped: $skipped";
         }
     }
 }
 
-// Fetch certificates
+/* ===== FETCH CERTIFICATES (FIXED) ===== */
 $sql = "
-    SELECT c.id AS cert_id, c.control_number, c.seminar_title, c.certificate_file, c.created_at,
-           u.id AS user_id, u.name, u.email
+    SELECT 
+        c.id AS cert_id,
+        c.control_number,
+        c.seminar_title,
+        c.certificate_file,
+        c.created_at,
+
+        u.id AS user_id,
+        u.name AS user_name,
+
+        COALESCE(u.email, c.teacher_email_pending) AS display_email
+
     FROM certificates c
-    LEFT JOIN users u ON c.teacher_id = u.id
+    LEFT JOIN users u 
+        ON c.teacher_id = u.id
+        OR LOWER(c.teacher_email_pending) = LOWER(u.email)
+
     ORDER BY c.created_at DESC
 ";
+
 $result = $conn->query($sql);
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -242,9 +262,17 @@ button:hover { background:#084a6b; }
         <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
             <td><?= htmlspecialchars($row['control_number']) ?></td>
-            <td><?= htmlspecialchars($row['name']) ?></td>
+            <td>
+                <?php
+                if (!empty($row['display_email'])) {
+                    echo htmlspecialchars(explode('@', $row['display_email'])[0]);
+                } else {
+                    echo 'Not registered';
+                }
+                ?>
+            </td>
             <td><?= htmlspecialchars($row['seminar_title']) ?></td>
-            <td><?= htmlspecialchars($row['email']) ?></td>
+            <td><?= htmlspecialchars($row['display_email'] ?? '') ?></td>
             <td><a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a></td>
             <td><a class="edit-btn" href="edit_certificate.php?id=<?= $row['cert_id'] ?>">Edit</a></td>
         </tr>
