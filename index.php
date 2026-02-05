@@ -1,6 +1,6 @@
 <?php
 session_start();
-// require_once __DIR__ . "/config/db.php";
+require_once __DIR__ . "/config/db.php";
 
 $result = null;
 $error = "";
@@ -35,7 +35,6 @@ if (isset($_GET['control_number'])) {
     }
 }
 ?>
-
 
 
 
@@ -361,9 +360,9 @@ if (isset($_GET['control_number'])) {
         <form method="GET">
         <div class="search-row">
         <input type="text" name="control_number" placeholder="Enter Control Number"
-               value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" autocomplete="off"required>
+               value=""<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" autocomplete="off"required>
         <button type="submit">Search</button>
-    </div>
+    </div>  
 </form>
     <?php if ($error): ?>
         <div class="error"><?= $error ?></div>
@@ -384,9 +383,8 @@ if (isset($_GET['control_number'])) {
             <p><strong>Seminar Title:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
             <p><strong>Control Number:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
             <p>
-                <a href="uploads/certificates/<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">
-                    📄 View Certificate
-                </a>
+                <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
+                    
             </p>
             <p><strong>Status:</strong> ✅ Verified</p>
     </div>
