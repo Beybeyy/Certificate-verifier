@@ -103,6 +103,10 @@ if (isset($_GET['control_number'])) {
             object-fit: contain;
         }
 
+        .logo-container img[alt="Division Logo"] {
+            height: 80px; /* Smaller than the DepEd logo */
+        }
+
 
        /* ===== BURGER ICON & ANIMATION ===== */
        .burger {
@@ -133,12 +137,28 @@ if (isset($_GET['control_number'])) {
         }
 
         /* ===== PAGE CENTER ===== */
-        .page-wrapper {
-            height: calc(100vh - 80px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.page-wrapper {
+    /* Removed the 80px offset to pull the card higher up */
+    min-height: 60vh; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 20px; /* Small gap between logos and card */
+}
+
+/* Optional: Improve Error/Result visibility */
+.error {
+    color: #d32f2f;
+    margin-top: 15px;
+    font-size: 14px;
+}
+.result {
+    margin-top: 20px;
+    text-align: left;
+    background: #f1f8ff;
+    padding: 15px;
+    border-radius: 8px;
+}
 
         /* ===== CARD ===== */
         .card {
