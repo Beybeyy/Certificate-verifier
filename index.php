@@ -11,9 +11,16 @@ if (isset($_GET['control_number'])) {
 
     if ($control !== "") {
         $stmt = $conn->prepare("
-            SELECT c.control_number, c.seminar_title, c.certificate_file, u.name
+            SELECT 
+                c.control_number,
+                c.seminar_title,
+                c.certificate_file,
+                COALESCE(u.name, 'Not registered') AS display_name,
+                COALESCE(u.email, c.teacher_email_pending) AS display_email
             FROM certificates c
-            JOIN users u ON c.teacher_id = u.id
+            LEFT JOIN users u 
+                ON c.teacher_id = u.id
+                OR LOWER(c.teacher_email_pending) = LOWER(u.email)
             WHERE c.control_number = ?
         ");
         $stmt->bind_param("s", $control);
@@ -28,6 +35,9 @@ if (isset($_GET['control_number'])) {
     }
 }
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -356,8 +366,15 @@ if (isset($_GET['control_number'])) {
     <?php if ($result && $result->num_rows > 0): 
         $row = $result->fetch_assoc();
     ?>
-        <div class="result">
-            <p><strong>Name:</strong> <?= htmlspecialchars($row['name']) ?></p>
+         <div class="result">
+           <?php
+
+            $display_name = !empty($row['display_name']) && $row['display_name'] !== 'Not registered' 
+                ? $row['display_name'] 
+                : (!empty($row['display_email']) ? explode('@', $row['display_email'])[0] : 'Not registered');
+            ?>
+            <p><strong>Name:</strong> <?= htmlspecialchars($display_name) ?></p>
+            <p><strong>Email:</strong> <?= htmlspecialchars($row['display_email']) ?></p>
             <p><strong>Seminar Title:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
             <p><strong>Control Number:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
             <p>
@@ -366,8 +383,9 @@ if (isset($_GET['control_number'])) {
                 </a>
             </p>
             <p><strong>Status:</strong> ✅ Verified</p>
-        </div>
-    <?php endif; ?>
+    </div>
+<?php endif; ?>
+
 
         <hr class="divider">
 
