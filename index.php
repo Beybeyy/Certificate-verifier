@@ -137,38 +137,39 @@ if (isset($_GET['control_number'])) {
         }
 
         /* ===== PAGE CENTER ===== */
-.page-wrapper {
-    /* Removed the 80px offset to pull the card higher up */
-    min-height: 60vh; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: 10px; /* Small gap between logos and card */
-}
+        .page-wrapper {
+            display: flex;
+            justify-content: center; /* Centers horizontally */
+            align-items: flex-start; /* Keeps it near the top/logos */
+            padding: 20px; 
+            flex: 1; /* Allow it to take up remaining vertical space */
+        }
 
-/* Optional: Improve Error/Result visibility */
-.error {
-    color: #d32f2f;
-    margin-top: 15px;
-    font-size: 14px;
-}
-.result {
-    margin-top: 20px;
-    text-align: left;
-    background: #f1f8ff;
-    padding: 15px;
-    border-radius: 8px;
-}
+        /* Optional: Improve Error/Result visibility */
+        .error {
+            color: #d32f2f;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            background: #f1f8ff;
+            padding: 15px;
+            border-radius: 8px;
+        }
 
         /* ===== CARD ===== */
         .card {
-            width: 600px;
+            width: 100%;
+            max-width: 600px; /* Limits width on desktop */
+            margin: 0 auto;   /* Ensures equal left/right margins */
             padding: 40px 45px;
             border: 1.8px solid #4a7fc2;
             border-radius: 16px;
             text-align: center;
+            background-color: #fff;
         }
-
         .card h2 {
             margin: 0;
             color: #123a6f;
