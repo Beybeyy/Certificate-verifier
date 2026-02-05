@@ -209,16 +209,77 @@ th { background:#1976d2; color:#fff; }
 tr:nth-child(even){ background:#f9f9f9; }
 tr:hover{ background:#e3f2fd; }
 
-/* PASTE THE PAGINATION FOOTER CSS HERE */
+/* Pagination Footer */
 .pagination-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background-color: #f1f8ff; /* Light blue from image */
-    border: 1px solid #ddd;
-    border-top: none; /* Merges with the table bottom */
-    font-size: 14px;
+    padding: 10px 20px; /* Thinner padding */
+    background-color: #f8fbff; /* Very light blue tint */
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    font-size: 13px; /* Slightly smaller text */
+    color: #333;
+}
+
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.row-select-wrapper {
+    color: #5c7c99;
+    font-size: 13px;
+}
+
+.row-select-wrapper select {
+    padding: 2px 5px;
+    border: 1px solid #1976d2;
+    border-radius: 4px;
+    color: #0b4a82;
+    background: transparent;
+    font-size: 13px;
+    margin-left: 5px;
+}
+
+/* Compact Pagination Buttons */
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Tight gap between buttons */
+}
+
+.page-num, .page-arrow {
+    background: white;
+    border: 1px solid #cfd8dc;
+    color: #1976d2;
+    min-width: 28px; /* Fixed small width */
+    height: 28px;    /* Fixed small height */
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: 0.2s;
+}
+
+.page-num.active {
+    background: #1976d2;
+    border-color: #1976d2;
+    color: white;
+}
+
+.page-num:hover:not(.active), .page-arrow:hover {
+    background: #f0f7ff;
+    border-color: #1976d2;
+}
+
+.page-arrow {
+    font-size: 10px; /* Small arrows */
+    color: #78909c;
 }
 
 a { color:#0b4a82; font-weight:bold; text-decoration:none; }
@@ -328,30 +389,33 @@ button:hover { background:#084a6b; }
             Showing <span id="start-row">1</span> to <span id="end-row">20</span> of <span id="total-rows">50</span> teachers
         </div>
         
-        <div class="footer-right">
-            <div class="row-select-wrapper">
-                Row per page: 
-                <select id="rowPerPage" onchange="changeRowsPerPage()">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30" selected>30</option>
-                    <option value="50">50</option>
-                </select>
+        <div class="pagination-footer">
+            <div class="footer-left">
+                Showing <b>1</b> to <b>20</b> of <b>50</b> teachers
             </div>
+            
+            <div class="footer-right">
+                <div class="row-select-wrapper">
+                    Row per page: 
+                    <select id="rowPerPage" onchange="changeRowsPerPage()">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30" selected>30</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
 
-            <div class="pagination-controls">
-                <button class="page-arrow" onclick="prevPage()">❮</button>
-                <div id="page-numbers">
+                <div class="pagination-controls">
+                    <button class="page-arrow" onclick="prevPage()">❮</button>
                     <button class="page-num active">1</button>
                     <button class="page-num">2</button>
                     <button class="page-num">3</button>
                     <button class="page-num">4</button>
                     <button class="page-num">5</button>
+                    <button class="page-arrow" onclick="nextPage()">❯</button>
                 </div>
-                <button class="page-arrow" onclick="nextPage()">❯</button>
             </div>
         </div>
-    </div>
 
     <?php else: ?>
     <p>No certificates found.</p>
@@ -427,9 +491,26 @@ function editName(btn, certId) {
     }
 }
 
-let currentPage = 1;
-function updatePaginationUI(page) {
-    // ... logic ...
+// Function to handle clicking page numbers
+document.querySelectorAll('.page-num').forEach(button => {
+    button.addEventListener('click', function() {
+        // Remove active class from all
+        document.querySelectorAll('.page-num').forEach(b => b.classList.remove('active'));
+        // Add to clicked
+        this.classList.add('active');
+        
+        const page = parseInt(this.innerText);
+        console.log("Navigating to page: " + page);
+        // Add your logic to filter/load data for the specific page here
+    });
+});
+
+function prevPage() {
+    console.log("Previous Page Clicked");
+}
+
+function nextPage() {
+    console.log("Next Page Clicked");
 }
 </script>
 
