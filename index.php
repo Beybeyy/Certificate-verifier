@@ -94,17 +94,17 @@ if (isset($_GET['control_number'])) {
             justify-content: center;
             align-items: center;
             gap: 20px;
-            padding: 30px 10px 10px 10px; /* Spacing between nav and login card */
+            padding: 10px 10px 10px 10px; /* Spacing between nav and login card */
         }
 
         .logo-container img {
-            height: 120px; /* Adjust size to match your images */
+            height: 140px; /* Adjust size to match your images */
             width: auto;
             object-fit: contain;
         }
 
         .logo-container img[alt="Division Logo"] {
-            height: 80px; /* Smaller than the DepEd logo */
+            height: 100px; /* Smaller than the DepEd logo */
         }
 
 
@@ -143,7 +143,7 @@ if (isset($_GET['control_number'])) {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: 20px; /* Small gap between logos and card */
+    padding-top: 10px; /* Small gap between logos and card */
 }
 
 /* Optional: Improve Error/Result visibility */
@@ -278,6 +278,32 @@ if (isset($_GET['control_number'])) {
                 border-bottom: 1px solid rgba(255,255,255,0.1);
                 font-size: 18px;
             }
+
+                    /* Make page wrapper flexible */
+            .page-wrapper {
+                height: auto; /* Remove fixed height calculation */
+                min-height: auto; 
+                padding: 20px 15px; /* Add breathing room on sides */
+                align-items: flex-start; /* Align to top so it doesn't float in middle */
+            }
+
+            /* Ensure the card fits the screen width */
+            .card {
+                width: 100%;
+                max-width: 100%;
+                padding: 25px 20px; /* Reduce internal padding */
+                border-radius: 12px;
+            }
+
+            /* Adjust search row for small screens */
+            .search-row {
+                flex-direction: column;
+            }
+
+            .search-row button {
+                width: 100%;
+            }
+
         
     </style>
 </head>
