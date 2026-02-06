@@ -294,6 +294,16 @@ a:hover { text-decoration:underline; }
 .edit-btn { background:#ff9800; color:#fff; padding:5px 10px; border-radius:5px; }
 .edit-btn:hover { background:#f57c00; }
 
+.logout {
+  color: black;        /* normal color */
+  text-decoration: none;
+  transition: color 0.2s ease; /* smooth change */
+}
+
+.logout:hover {
+  color: red;
+}
+
 /* Modal */
 .modal { display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.5); }
 .modal-content { background:#fefefe; margin:10% auto; padding:20px; border-radius:10px; width:400px; position:relative; box-shadow:0 0 20px rgba(0,0,0,0.2); }
@@ -318,7 +328,7 @@ button:hover { background:#084a6b; }
         <a href="../index.php">Home</a>
         <a href="../about.php">About</a>
         <a href="#">Contact</a>
-        <a href="../login.php">Logout</a>
+        <a href="../login.php" class="logout">Logout  </a>
     </div>
 </nav>  
 
