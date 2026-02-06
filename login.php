@@ -110,9 +110,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .logo-container img {
-            height: 120px; /* Adjust size to match your images */
+            height: 140px; /* Adjust size to match your images */
             width: auto;
             object-fit: contain;
+        }
+
+        .logo-container img[alt="Division Logo"] {
+            height: 90px; /* Smaller than the DepEd logo */
         }
 
         /* ===== BURGER ICON & ANIMATION ===== */

@@ -113,7 +113,7 @@ if (isset($_GET['control_number'])) {
         }
 
         .logo-container img[alt="Division Logo"] {
-            height: 100px; /* Smaller than the DepEd logo */
+            height: 90px; /* Smaller than the DepEd logo */
         }
 
 

@@ -37,8 +37,13 @@ $certificates = $stmt2->get_result();
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 /* General */
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Arial, sans-serif; }
-body { background: #f4f6f8; color: #1a1a1a; padding: 20px; }
+* { 
+    box-sizing: border-box;
+     margin: 0; 
+     padding: 0; 
+     font-family: "Segoe UI", Arial, sans-serif; }
+
+body { margin:0; font-family:"Segoe UI", Arial, sans-serif; background:#fff; color:#1a1a1a; display:flex; flex-direction:column; min-height:100vh; overflow-x:hidden; }
 
 /* Top Nav */
 .top-nav { background:#0b4a82; padding:15px 40px; display:flex; justify-content:space-between; align-items:center; color:#fff; position:relative; z-index:1000; }
@@ -56,14 +61,15 @@ body { background: #f4f6f8; color: #1a1a1a; padding: 20px; }
 
 
 /* Container */
-.container { max-width: 1000px; margin: 0 auto; }
+.container { max-width: 2000px; margin: 0 auto; }
 
 /* Header */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
 }
 .header h2 { color: #0b4a82; font-size: 24px; }
@@ -82,14 +88,54 @@ body { background: #f4f6f8; color: #1a1a1a; padding: 20px; }
 .teacher-info { margin-bottom: 30px; }
 .teacher-info p { font-size: 16px; color: #333; }
 
-/* Table */
-table {
+.table-wrapper {
     width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     margin-bottom: 30px;
 }
+
+.cert-table {
+    width: 100%;
+    max-width: 1500px;          /* reasonable max width */
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    background: #fff;
+}
+
+/* Header row - solid blue background, white text */
+.cert-table thead tr {
+    background-color: #0b4a82;
+    color: white;
+    font-weight: 600;
+}
+
+/* Header cells */
+.cert-table thead th {
+    padding: 14px 18px;
+    text-align: left;
+    border: none;
+}
+
+/* Body rows */
+.cert-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;  /* very light gray */
+}
+
+.cert-table tbody tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+/* Body cells */
+.cert-table tbody td {
+    padding: 14px 50px;
+    border: 1px solid #ddd;
+    vertical-align: middle;
+}
+
 th, td {
     padding: 12px 15px;
     border: 1px solid #ddd;
@@ -128,10 +174,22 @@ a:hover { text-decoration:underline; }
 
 /* Responsive */
 @media (max-width: 768px) {
-    table, th, td { font-size: 14px; }
-    .header { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .logout a { padding: 6px 12px; margin-top: 10px; }
-}
+    .cert-table {
+        font-size: 14px;
+        max-width: 100%;
+    }
+
+    /* Make table horizontally scrollable */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    /* Optional: reduce cell padding */
+    .cert-table thead th,
+    .cert-table tbody td {
+        padding: 10px 12px;
+    }
+
 </style>
 </head>
 <body>
@@ -160,9 +218,9 @@ a:hover { text-decoration:underline; }
             }
             ?>
         </h2>
-        <div class="logout">
+        <!-- <div class="logout"> 
             <a href="../login.php">Logout</a>
-        </div>
+        </div>-->
     </div>
 
     <div class="teacher-info">
@@ -172,22 +230,26 @@ a:hover { text-decoration:underline; }
     <h3>Your Certificates</h3>
 
     <?php if ($certificates->num_rows > 0): ?>
-    <table>
-        <tr>
-            <th>Control Number</th>
-            <th>Seminar Title</th>
-            <th>Certificate</th>
-        </tr>
-        <?php while ($row = $certificates->fetch_assoc()): ?>
-        <tr>
-            <td><?= htmlspecialchars($row['control_number']) ?></td>
-            <td><?= htmlspecialchars($row['seminar_title']) ?></td>
-            <td>
-                <a class="view-pdf" href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">
-                    View Certificate
-                </a>
-            </td>
-        </tr>
+    <div class="table-wrapper">
+    <table class="cert-table">
+        <thead>
+            <tr>
+                <th>Control Number</th>
+                <th>Seminar Title</th>
+                <th>Certificate</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while ($row = $certificates->fetch_assoc()): ?>
+            <tr>
+                <td data-label="Control Number"><?= htmlspecialchars($row['control_number']) ?></td>
+                <td data-label="Seminar Title"><?= htmlspecialchars($row['seminar_title']) ?></td>
+                <td data-label="Certificate">
+                    <a class="view-pdf" href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">
+                        View Certificate
+                    </a>
+                </td>
+            </tr>
         <?php endwhile; ?>
     </table>
     <?php else: ?>
