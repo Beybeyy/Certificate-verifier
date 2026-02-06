@@ -35,6 +35,11 @@ if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
 }
+// ===== PAGINATION SETUP =====
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$rowsPerPage = isset($_GET['rows']) ? (int)$_GET['rows'] : 100;
+$offset = ($page - 1) * $rowsPerPage;
+
 
 /* ===== HANDLE CSV UPLOAD ===== */
 $messages = [];
@@ -135,8 +140,10 @@ $sql = "
         ON c.teacher_id = u.id
         OR LOWER(c.teacher_email_pending) = LOWER(u.email)
     ORDER BY c.created_at DESC
+    LIMIT $rowsPerPage OFFSET $offset
 ";
-
+$totalResult = $conn->query("SELECT COUNT(*) AS total FROM certificates");
+$totalRows = $totalResult->fetch_assoc()['total'];   
 $result = $conn->query($sql);
 ?>
 
@@ -308,8 +315,8 @@ button:hover { background:#084a6b; }
     <div class="nav-brand">Department of Education<br>Certificate Verifier</div>
     <div class="burger" id="burger"><span></span><span></span><span></span></div>
     <div class="nav-links" id="nav-menu">
-        <a href="#">Home</a>
-        <a href="#">About</a>
+        <a href="../index.php">Home</a>
+        <a href="../about.php">About</a>
         <a href="#">Contact</a>
         <a href="../login.php">Logout</a>
     </div>
@@ -348,11 +355,13 @@ button:hover { background:#084a6b; }
         </div>
         <?php endif; ?>
       </div>
-    </div>
+    </div>  
 
     <?php if ($result->num_rows > 0): ?>
     <table>
+        <?php $rowNumber = 1; ?>
         <tr>
+             <th>No.</th>
             <th>Control Number</th>
             <th>Name</th>
             <th>Seminar/Workshop Attended</th>
@@ -360,8 +369,10 @@ button:hover { background:#084a6b; }
             <th>Certificate</th>
             <th>Action</th>
         </tr>
+        <?php $rowNumber = $offset + 1; ?>
         <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
+            <td><?= $rowNumber++ ?></td>
             <td><?= htmlspecialchars($row['control_number']) ?></td>
             <td>
                 <span class="name-text">
@@ -386,29 +397,41 @@ button:hover { background:#084a6b; }
 
         <div class="pagination-footer">
             <div class="footer-left">
-                Showing <b>1</b> to <b>20</b> of <b>50</b> teachers
+                <?php
+                $start = $offset + 1;
+                $end = min($offset + $rowsPerPage, $totalRows);
+                ?>
+                Showing <b><?= $start ?></b> to <b><?= $end ?></b> of <b><?= $totalRows ?></b> teachers
             </div>
             
             <div class="footer-right">
                 <div class="row-select-wrapper">
                     Row per page: 
-                    <select id="rowPerPage" onchange="changeRowsPerPage()">
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="30" selected>30</option>
-                        <option value="50">50</option>
+                    <select onchange="location.href='?page=1&rows='+this.value">
+                        <option value="10" <?= $rowsPerPage==10 ? 'selected' : '' ?>>10</option>
+                        <option value="20" <?= $rowsPerPage==20 ? 'selected' : '' ?>>20</option>
+                        <option value="30" <?= $rowsPerPage==30 ? 'selected' : '' ?>>30</option>
+                        <option value="50" <?= $rowsPerPage==50 ? 'selected' : '' ?>>50</option>
                     </select>
                 </div>
 
                 <div class="pagination-controls">
-                    <button class="page-arrow" onclick="prevPage()">❮</button>
-                    <button class="page-num active">1</button>
-                    <button class="page-num">2</button>
-                    <button class="page-num">3</button>
-                    <button class="page-num">4</button>
-                    <button class="page-num">5</button>
-                    <button class="page-arrow" onclick="nextPage()">❯</button>
-                </div>
+    <!-- Previous arrow -->
+            <a class="page-arrow" href="?page=<?= max(1, $page-1) ?>&rows=<?= $rowsPerPage ?>">❮</a>
+
+            <?php
+            $totalPages = ceil($totalRows / $rowsPerPage);
+            // Show up to 10 page numbers (adjustable)
+            $startPage = max(1, $page - 4);
+            $endPage = min($totalPages, $page + 5);
+
+            for ($i = $startPage; $i <= $endPage; $i++): ?>
+                <a class="page-num <?= $i==$page ? 'active' : '' ?>" href="?page=<?= $i ?>&rows=<?= $rowsPerPage ?>"><?= $i ?></a>
+            <?php endfor; ?>
+
+            <!-- Next arrow -->
+            <a class="page-arrow" href="?page=<?= min($totalPages, $page+1) ?>&rows=<?= $rowsPerPage ?>">❯</a>
+        </div>
             </div>
         </div>
 
