@@ -166,8 +166,25 @@ h2 { color:#0b4a82; margin-top:0; }
 .nav-links a:hover { text-decoration:underline; }
 
 /* Burger */
-.burger { display:none; flex-direction:column; cursor:pointer; gap:5px; z-index:1001; }
-.burger span { height:3px; width:28px; background:white; border-radius:5px; transition:all 0.3s ease; }
+.burger { 
+    display:none; 
+    flex-direction:column; 
+    cursor:pointer; 
+    gap:5px; z-index:1001; }
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+    z-index: 1003; /* Higher than .nav-links */
+    position: relative; /* Ensure it stays above */
+
+.burger span { 
+    height:3px; 
+    width:28px; 
+    background:white; 
+    border-radius:5px; 
+    transition:all 0.3s ease; }
+    
 .burger.toggle span:nth-child(1) { transform:rotate(-45deg) translate(-5px,6px); }
 .burger.toggle span:nth-child(2) { opacity:0; }
 .burger.toggle span:nth-child(3) { transform:rotate(45deg) translate(-5px,-6px); }
@@ -305,8 +322,19 @@ a:hover { text-decoration:underline; }
 }
 
 /* Modal */
-.modal { display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.5); }
-.modal-content { background:#fefefe; margin:10% auto; padding:20px; border-radius:10px; width:400px; position:relative; box-shadow:0 0 20px rgba(0,0,0,0.2); }
+.modal { 
+    display:none; 
+    position:fixed; 
+    z-index:999;
+    left:0; 
+    top:0; 
+    width:100%; 
+    height:100%; 
+    overflow:auto; 
+    background-color:rgba(0,0,0,0.5); 
+}
+.modal-content { 
+    background:#fefefe; margin:10% auto; padding:20px; border-radius:10px; width:400px; position:relative; box-shadow:0 0 20px rgba(0,0,0,0.2); }
 .close { color:#aaa; position:absolute; top:10px; right:15px; font-size:28px; font-weight:bold; cursor:pointer; }
 .close:hover { color:#000; }
 .messages { margin-top:10px; background:#fff; padding:15px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.05); max-height:200px; overflow:auto; }
@@ -316,6 +344,128 @@ a:hover { text-decoration:underline; }
 input[type="file"] { display:block; margin-bottom:15px; padding:6px; }
 button { background:#0b4a82; color:#fff; padding:10px 25px; border-radius:5px; border:none; cursor:pointer; font-size:16px; }
 button:hover { background:#084a6b; }
+
+.mobile-close {
+    display: none;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Remove old conflicting burger styles first */
+.burger { display: none; }  /* Hide on desktop */
+
+/* Mobile burger and slide-in menu */
+@media (max-width: 768px) {
+    .burger {
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+        gap: 5px;
+        z-index: 1003;
+    }
+
+    .burger span {
+        height: 3px;
+        width: 28px;
+        background: white;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .burger.toggle span:nth-child(1) {
+        transform: rotate(-45deg) translate(-5px, 6px);
+    }
+    .burger.toggle span:nth-child(2) { opacity: 0; }
+    .burger.toggle span:nth-child(3) {
+        transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        height: 100%;
+        width: 30%;
+        background: #0b4a82;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 60px 20px;
+        gap: 25px;
+        transition: right 0.3s ease;
+        z-index: 1002;
+    }
+
+    .nav-links.active {
+        right: 0;
+    }
+
+    .nav-links a {
+        margin: 0;
+        padding: 20px 30px;
+        width: 100%;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 18px;
+    }
+}
+
+/* Desktop nav links always visible */
+@media (min-width: 769px) {
+    .nav-links {
+        display: flex !important;
+        position: static;
+        height: auto;
+        width: auto;
+        flex-direction: row;
+        background: none;
+        padding: 0;
+        gap: 35px;
+    }
+}
+
+    .header-container { display:flex; flex-direction:column; gap:10px; }
+    .controls-container { display:flex; flex-direction:column; align-items:stretch; gap:10px; }
+    .controls-container button.upload-btn { width:100%; }
+    .search-container input { width:100%; }
+}
+    .controls-container {
+        display: flex;
+        flex-direction: column; /* stack Upload and Search */
+        align-items: stretch;   /* full width */
+        gap: 10px;
+    }
+
+    .controls-container button.upload-btn {
+        width: 100%;
+    }
+
+    .search-container input {
+        width: 100%; /* full width search bar */
+    }
+    .header-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* spacing between heading and controls */
+    }
+
+    .controls-container {
+        display: flex;
+        flex-direction: column; /* stack Upload and Search */
+        align-items: stretch;   /* full width */
+        gap: 10px;
+    }
+
+    .controls-container button.upload-btn {
+        width: 100%;
+    }
+
+    .search-container input {
+        width: 100%; /* full width search bar */
+    }
 </style>
 </head>
 <body>
@@ -323,7 +473,13 @@ button:hover { background:#084a6b; }
 <!-- TOP NAV -->
 <nav class="top-nav">
     <div class="nav-brand">Department of Education<br>Certificate Verifier</div>
-    <div class="burger" id="burger"><span></span><span></span><span></span></div>
+    
+    <div class="burger" id="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
     <div class="nav-links" id="nav-menu">
         <a href="../index.php">Home</a>
         <a href="../about.php">About</a>
@@ -337,6 +493,7 @@ button:hover { background:#084a6b; }
             <h2>Admin Dashboard</h2>
             
             <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="uploadBtn" class="dl"> Download Template </button>
                 <button id="uploadBtn" class="upload-btn">Upload</button>
                 
                 <div class="search-container">

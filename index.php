@@ -320,6 +320,14 @@ if (isset($_GET['control_number'])) {
                 width: 100%;
             }
 
+            .burger {
+                display: flex;
+                flex-direction: column;
+                cursor: pointer;
+                gap: 5px;
+                z-index: 1000;
+            }
+
         
     </style>
 </head>
