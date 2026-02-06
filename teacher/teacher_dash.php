@@ -40,6 +40,21 @@ $certificates = $stmt2->get_result();
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Arial, sans-serif; }
 body { background: #f4f6f8; color: #1a1a1a; padding: 20px; }
 
+/* Top Nav */
+.top-nav { background:#0b4a82; padding:15px 40px; display:flex; justify-content:space-between; align-items:center; color:#fff; position:relative; z-index:1000; }
+.nav-brand { font-size:18px; font-weight:500; line-height:1.2; }
+.nav-links { display:flex; align-items:center; }
+.nav-links a { color:#fff; text-decoration:none; margin-left:35px; font-size:15px; font-weight:400; }
+.nav-links a:hover { text-decoration:underline; }
+
+/* Burger */
+.burger { display:none; flex-direction:column; cursor:pointer; gap:5px; z-index:1001; }
+.burger span { height:3px; width:28px; background:white; border-radius:5px; transition:all 0.3s ease; }
+.burger.toggle span:nth-child(1) { transform:rotate(-45deg) translate(-5px,6px); }
+.burger.toggle span:nth-child(2) { opacity:0; }
+.burger.toggle span:nth-child(3) { transform:rotate(45deg) translate(-5px,-6px); }
+
+
 /* Container */
 .container { max-width: 1000px; margin: 0 auto; }
 
@@ -96,6 +111,21 @@ a.view-pdf {
 }
 a.view-pdf:hover { text-decoration: underline; }
 
+a { color:#0b4a82; font-weight:bold; text-decoration:none; }
+a:hover { text-decoration:underline; }
+.edit-btn { background:#ff9800; color:#fff; padding:5px 10px; border-radius:5px; }
+.edit-btn:hover { background:#f57c00; }
+
+.logout {
+  color: black;        /* normal color */
+  text-decoration: none;
+  transition: color 0.2s ease; /* smooth change */
+}
+
+.logout:hover {
+  color: red;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     table, th, td { font-size: 14px; }
@@ -105,6 +135,18 @@ a.view-pdf:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+    <div class="nav-brand">Department of Education<br>Certificate Verifier</div>
+    <div class="burger" id="burger"><span></span><span></span><span></span></div>
+    <div class="nav-links" id="nav-menu">
+        <a href="../index.php">Home</a>
+        <a href="../about.php">About</a>
+        <a href="#">Contact</a>
+        <a href="../login.php" class="logout">Logout  </a>
+    </div>
+</nav> 
 
 <div class="container">
     <div class="header">
@@ -153,5 +195,22 @@ a.view-pdf:hover { text-decoration: underline; }
     <?php endif; ?>
 </div>
 
+<script>
+// Burger menu toggle
+const burger = document.getElementById('burger');
+const navMenu = document.getElementById('nav-menu');
+burger.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+    burger.classList.toggle('toggle');
+});
+document.querySelectorAll('.nav-links a').forEach(link=>{
+    link.addEventListener('click',()=>{
+        navMenu.classList.remove('active');
+        burger.classList.remove('toggle');
+    });
+});
+
+
+</script>
 </body>
 </html>
