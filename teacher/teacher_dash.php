@@ -189,6 +189,7 @@ a:hover { text-decoration:underline; }
     .cert-table tbody td {
         padding: 10px 12px;
     }
+}
 
 </style>
 </head>

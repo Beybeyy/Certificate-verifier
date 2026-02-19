@@ -170,13 +170,14 @@ h2 { color:#0b4a82; margin-top:0; }
     display:none; 
     flex-direction:column; 
     cursor:pointer; 
-    gap:5px; z-index:1001; }
+    gap:5px; z-index:1001; 
     display: flex;
     flex-direction: column;
     cursor: pointer;
     gap: 5px;
     z-index: 1003; /* Higher than .nav-links */
     position: relative; /* Ensure it stays above */
+}
 
 .burger span { 
     height:3px; 
@@ -427,11 +428,24 @@ button:hover { background:#084a6b; }
     }
 }
 
-    .header-container { display:flex; flex-direction:column; gap:10px; }
-    .controls-container { display:flex; flex-direction:column; align-items:stretch; gap:10px; }
-    .controls-container button.upload-btn { width:100%; }
-    .search-container input { width:100%; }
-}
+    .header-container { 
+        display:flex; 
+        flex-direction:column; 
+        gap:10px; 
+    }
+    .controls-container {
+        display:flex; 
+        flex-direction:column; 
+        align-items:stretch; 
+        gap:10px; 
+    }
+    .controls-container button.upload-btn { 
+        width:100%; 
+    }
+    .search-container input { 
+        width:100%; 
+    }
+
     .controls-container {
         display: flex;
         flex-direction: column; /* stack Upload and Search */
