@@ -21,6 +21,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: register.php");
         exit();
     }
+        // Convert email to lowercase and trim
+    $email = strtolower(trim($email));
+
+    // // Check email ends with @deped.gov.ph
+    // if (!str_ends_with($email, '@deped.gov.ph')) {
+    //     $_SESSION['error'] = "⚠️ Only DepEd email addresses are allowed!";
+    //     header("Location: register.php");
+    //     exit();
+    // }
 
     // Check if email exists
     $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
@@ -280,22 +289,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form action="registration_process.php" method="POST">
             <div class="form-group">
                 <label>Complete Name</label>
-                <input type="text" name="fullname" required>
+                <input type="text" name="fullname" required autocomplete="off">
             </div>
             
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Confirm Password</label>
-                <input type="password" name="confirm_password" required>
+                <input type="email" name="email" required autocomplete="off">
             </div>
             
             <button type="submit" class="btn-register">Register</button>
