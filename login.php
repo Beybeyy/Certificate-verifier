@@ -4,7 +4,6 @@ require_once __DIR__ . "/config/db.php";
 
 $error = "";
 
-// Handle login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
@@ -12,28 +11,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($email === "" || $password === "") {
         $error = "⚠️ Please enter email and password.";
     } else {
-        // Check credentials
-        $stmt = $conn->prepare("SELECT id, name, email, role FROM users WHERE email = ? AND password = ?");
-        $stmt->bind_param("ss", $email, $password);
+        $stmt = $conn->prepare("SELECT id, name, email, role, password FROM users WHERE email=?");
+        $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
+            $db_password = trim($user['password']);
+            $login_ok = false;
 
-            // Set sessions
-            $_SESSION['id']    = $user['id'];   // Important: use 'id'
-            $_SESSION['name']  = $user['name'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['role']  = $user['role'];
+            if (!empty($db_password)) {
+                // Hashed password
+                if (password_get_info($db_password)['algo'] !== 0) {
+                    if (password_verify($password, $db_password)) $login_ok = true;
+                } else {
+                    // Plain text password
+                    if ($password === $db_password) {
+                        $login_ok = true;
+                        // Hash the plain password and update DB
+                        $hashed = password_hash($password, PASSWORD_DEFAULT);
+                        $stmt_update = $conn->prepare("UPDATE users SET password=? WHERE id=?");
+                        $stmt_update->bind_param("si", $hashed, $user['id']);
+                        $stmt_update->execute();
+                    }
+                }
+            }
 
-            // Redirect based on role
-            if ($user['role'] === "teacher") {
-                header("Location: teacher/teacher_dash.php");
+            if ($login_ok) {
+                $_SESSION['id'] = $user['id'];
+                $_SESSION['name'] = $user['name'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['role'] = $user['role'];
+
+                if ($user['role'] === "teacher") {
+                    header("Location: teacher/teacher_dash.php");
+                } else {
+                    header("Location: admin/dashboard.php");
+                }
                 exit();
             } else {
-                header("Location: admin/dashboard.php");
-                exit();
+                $error = "❌ Invalid email or password.";
             }
         } else {
             $error = "❌ Invalid email or password.";
@@ -41,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -185,6 +204,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 8px;
             font-size: 16px;
         }
+                .forgot-password {
+            text-align: right;
+            margin-bottom: 8px;
+        }
+
+        .forgot-password a {
+            color: #0056b3;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
 
         /* ===== BUTTONS ===== */
         .btn-upload {
@@ -215,13 +248,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
             width: 100%;
             display: block;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         /* ===== NEW REGISTRATION TEXT STYLING ===== */
         .register-text {
             font-size: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 9px;
             color: #1a1a1a;
             font-weight: 500;
         }
@@ -244,6 +277,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            position: relative;
+            top: -7px;
         }
 
        /* ===== MOBILE RESPONSIVE LOGIC ===== */
@@ -331,14 +366,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <input type="password" name="password" placeholder="Enter your password" required autocomplete="off">
             </div>
-
-            <!-- <button type="button" id="uploadBtn" class="btn-upload" disabled>upload excel</button> -->
+             <div class="forgot-password">
+                <a href="forgot_password.php">Forgot Password?</a>
+            </div>
 
             <button type="submit" class="btn-login">Login</button>
 
-            <div class="register-text">Don't have an account? <a href="register.php">Register here</a> </div>
-
-            <a href="http://10.10.8.218:8080/Certificate-verifier/index.php" class="back-link">
+            <div class="register-text">Don't have an account? <br><a href="register.php">Register here</a> </div>
+             
+            <a href="index.php" class="back-link">
                 <span>&lt;</span> back to verifier
             </a>
         </form>

@@ -1,8 +1,8 @@
 <?php
 session_start();
 require_once __DIR__ . "/../config/db.php";
- 
- /* ===== INLINE NAME UPDATE ===== */
+
+/* ===== INLINE NAME UPDATE ===== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_name'])) {
     $cert_id = (int)$_POST['id'];
     $new_name = trim($_POST['name']);
@@ -29,17 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_name'])) {
     exit;
 }
 
-
 /* ===== ADMIN CHECK ===== */
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
 }
-// ===== PAGINATION SETUP =====
+
+/* ===== PAGINATION SETUP ===== */
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $rowsPerPage = isset($_GET['rows']) ? (int)$_GET['rows'] : 100;
 $offset = ($page - 1) * $rowsPerPage;
-
 
 /* ===== HANDLE CSV UPLOAD ===== */
 $messages = [];
@@ -63,9 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 
                 if (count(array_filter($row)) === 0) continue;
 
-                [$control, $teacher_email, $title, $certificate_file] = array_map('trim', $row);
+                // CSV column order: control_number | name | seminar_title | teacher_email | certificate_file
+                [$control, $name, $title, $teacher_email, $certificate_file] = array_map('trim', $row);
 
-                if (!$control || !$teacher_email || !$title || !$certificate_file) {
+                if (!$control || !$name || !$title || !$teacher_email || !$certificate_file) {
                     $skipped++;
                     continue;
                 }
@@ -88,6 +88,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                 if ($res->num_rows > 0) {
                     $teacher_id = $res->fetch_assoc()['id'];
                     $teacher_email_pending = null;
+
+                    // Optionally update user name if empty
+                    $updateUser = $conn->prepare("UPDATE users SET name=? WHERE id=? AND (name IS NULL OR name='')");
+                    $updateUser->bind_param("si", $name, $teacher_id);
+                    $updateUser->execute();
                 } else {
                     $teacher_id = null;
                     $teacher_email_pending = $teacher_email;
@@ -96,14 +101,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                 // Insert certificate
                 $insert = $conn->prepare("
                     INSERT INTO certificates 
-                    (control_number, teacher_id, teacher_email_pending, seminar_title, certificate_file)
-                    VALUES (?, ?, ?, ?, ?)
+                    (control_number, teacher_id, teacher_email_pending, temp_name, seminar_title, certificate_file)
+                    VALUES (?, ?, ?, ?, ?, ?)
                 ");
                 $insert->bind_param(
-                    "sisss",
+                    "sissss",
                     $control,
                     $teacher_id,
                     $teacher_email_pending,
+                    $name,       // temp_name
                     $title,
                     $certificate_file
                 );
@@ -121,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
     }
 }
 
-/* ===== FETCH CERTIFICATES (FIXED) ===== */
+/* ===== FETCH CERTIFICATES ===== */
 $sql = "
     SELECT 
         c.id AS cert_id,
@@ -132,20 +138,20 @@ $sql = "
 
         u.id AS user_id,
         u.name AS user_name,
-        c.temp_name AS temp_name,          -- add this
-
+        c.temp_name AS temp_name,
         COALESCE(u.email, c.teacher_email_pending) AS display_email
     FROM certificates c
     LEFT JOIN users u 
         ON c.teacher_id = u.id
-        OR LOWER(c.teacher_email_pending) = LOWER(u.email)
     ORDER BY c.created_at DESC
     LIMIT $rowsPerPage OFFSET $offset
 ";
+
 $totalResult = $conn->query("SELECT COUNT(*) AS total FROM certificates");
 $totalRows = $totalResult->fetch_assoc()['total'];   
 $result = $conn->query($sql);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -201,6 +207,17 @@ h2 { color:#0b4a82; margin-top:0; }
     cursor: pointer;
 }
 .upload-btn:hover { background:#e68a00; text-decoration:none; }
+
+.dlbtn { 
+    background: #1b5e20; /* Dark green */
+    color: white; 
+    padding: 8px 25px; 
+    border-radius: 8px; 
+    font-weight: bold; 
+    border: none;
+    cursor: pointer;
+}
+.dlbtn:hover { background:#e68a00; text-decoration:none; }
 
 /* Search Bar Container */
 .search-container {
@@ -466,6 +483,20 @@ button:hover { background:#084a6b; }
     .search-container input {
         width: 100%; /* full width search bar */
     }
+.dbutton {
+    display: inline-block;       /* Makes it behave like a button */
+    padding: 10px 20px;          /* Space inside the button */
+    background-color: #28a745;   /* Button background color */
+    color: white;                /* Text color */
+    text-decoration: none;       /* Remove underline */
+    border-radius: 5px;          /* Rounded corners */
+    font-weight: 600;            /* Bold text */
+    transition: background 0.3s; /* Smooth hover effect */
+}
+
+.dbutton:hover {
+    background-color: #218838;   /* Darker shade on hover */
+}
 </style>
 </head>
 <body>
@@ -493,7 +524,7 @@ button:hover { background:#084a6b; }
             <h2>Admin Dashboard</h2>
             
             <div style="display: flex; align-items: center; gap: 10px;">
-                <button id="uploadBtn" class="dl"> Download Template </button>
+                <a href="../files/template.xlsx" download class="dbutton">Download Template</a>
                 <button id="uploadBtn" class="upload-btn">Upload</button>
                 
                 <div class="search-container">
@@ -543,8 +574,13 @@ button:hover { background:#084a6b; }
             <td><?= htmlspecialchars($row['control_number']) ?></td>
             <td>
                 <span class="name-text">
-                    <?= htmlspecialchars($row['temp_name'] ?? $row['user_name'] ?? explode('@', $row['display_email'])[0] ?? 'Not registered') ?>
-                </span>
+            <?= htmlspecialchars(
+                $row['user_name']
+                ?? $row['temp_name']
+                ?? (isset($row['display_email']) ? explode('@', $row['display_email'])[0] : null)
+                ?? 'Not registered'
+            ) ?>
+         </span>
 
                 <input type="text"
                     class="name-input"
@@ -554,7 +590,7 @@ button:hover { background:#084a6b; }
             </td>
             <td><?= htmlspecialchars($row['seminar_title']) ?></td>
             <td><?= htmlspecialchars($row['display_email'] ?? '') ?></td>
-            <td><a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a></td>
+            <td><a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">Link</a></td>
             <td><button class="edit-btn" onclick="editName(this, <?= $row['cert_id'] ?>)">
                Edit
              </button></td>

@@ -10,17 +10,17 @@ if (isset($_GET['control_number'])) {
     $control = trim($_GET['control_number']);
 
     if ($control !== "") {
+        // Prepare SQL: join only on teacher_id
         $stmt = $conn->prepare("
             SELECT 
                 c.control_number,
                 c.seminar_title,
                 c.certificate_file,
-                COALESCE(u.name, 'Not registered') AS display_name,
+                COALESCE(u.name, c.temp_name) AS display_name,
                 COALESCE(u.email, c.teacher_email_pending) AS display_email
             FROM certificates c
             LEFT JOIN users u 
                 ON c.teacher_id = u.id
-                OR LOWER(c.teacher_email_pending) = LOWER(u.email)
             WHERE c.control_number = ?
         ");
         $stmt->bind_param("s", $control);
@@ -35,8 +35,6 @@ if (isset($_GET['control_number'])) {
     }
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -319,7 +317,19 @@ if (isset($_GET['control_number'])) {
             .search-row button {
                 width: 100%;
             }
+             .burger.reset-icon {
+                font-size: 18px;
+                text-decoration: none;
+                color: #888;
+                padding: 8px;
+                border-radius: 50%;
+                transition: 0.2s ease;
+            }
 
+            .reset-icon:hover {
+                background-color: #f0f0f0;
+                color: #d00000;
+            }
             .burger {
                 display: flex;
                 flex-direction: column;
@@ -328,6 +338,24 @@ if (isset($_GET['control_number'])) {
                 z-index: 1000;
             }
 
+            .reset-btn {
+            background-color: #e74c3c; /* Red */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            /* Darker red shadow */
+        }
+
+        /* Hover effect */
+        .reset-btn:hover {
+            background-color: #ff5c5c;
+        }
+
+       
         
     </style>
 </head>
@@ -368,41 +396,46 @@ if (isset($_GET['control_number'])) {
         <form method="GET">
         <div class="search-row">
         <input type="text" name="control_number" placeholder="Enter Control Number"
-               value=""<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" autocomplete="off"required>
+        value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" autocomplete="off"required>   
         <button type="submit">Search</button>
+        <input type="reset" value="Reset" class="reset-btn" onclick="window.location='index.php'">   
+         
+        </a>
     </div>  
 </form>
     <?php if ($error): ?>
-        <div class="error"><?= $error ?></div>
-    <?php endif; ?>
+    <div class="error"><?= htmlspecialchars($error) ?></div>
+<?php endif; ?>
 
-    <?php if ($result && $result->num_rows > 0): 
-        $row = $result->fetch_assoc();
-    ?>
-         <div class="result">
-           <?php
+<?php if ($result && $result->num_rows > 0): 
+    $row = $result->fetch_assoc();
 
-            $display_name = !empty($row['display_name']) && $row['display_name'] !== 'Not registered' 
-                ? $row['display_name'] 
-                : (!empty($row['display_email']) ? explode('@', $row['display_email'])[0] : 'Not registered');
-            ?>
-            <p><strong>Name:</strong> <?= htmlspecialchars($display_name) ?></p>
-            <p><strong>Email:</strong> <?= htmlspecialchars($row['display_email']) ?></p>
-            <p><strong>Seminar Title:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
-            <p><strong>Control Number:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
-            <p>
-                <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
-                    
-            </p>
-            <p><strong>Status:</strong> ✅ Verified</p>
+    // Name logic same as admin dashboard
+    $display_name = !empty($row['display_name'])
+        ? $row['display_name']
+        : (!empty($row['display_email']) ? explode('@', $row['display_email'])[0] : 'Not registered');
+
+    // Email logic
+    $display_email = !empty($row['display_email'])
+        ? $row['display_email']
+        : 'No email';
+?>
+    <div class="result">
+        <p><strong>Name:</strong> <?= htmlspecialchars($display_name) ?></p>
+        <p><strong>Email:</strong> <?= htmlspecialchars($display_email) ?></p>
+        <p><strong>Seminar Title:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
+        <p><strong>Control Number:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
+        <p>
+            <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
+        </p>
+        <p><strong>Status:</strong> ✅ Verified</p>
     </div>
 <?php endif; ?>
 
-
         <hr class="divider">
 
-        <div class="login-text">Refer to the area below your certificate to find your control number.</div>
-        <a href="http://10.10.8.218:8080/Certificate-verifier/login.php" class="login-link">Login</a>
+        <div class="login-text">You can find your control number at the bottom right of your certificate.</div>
+        <a href="login.php" class="login-link">Login</a>
     </div>
 </div>
 
