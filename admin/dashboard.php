@@ -126,7 +126,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
         }
     }
 }
+/* ===== SORTING ===== */
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
 
+// ALWAYS define default first (in case no case matches)
+$orderBy = "ORDER BY c.created_at DESC"; // newest first
+
+switch ($sort) {
+
+    // CONTROL NUMBER
+    case 'control_new': // newest first
+        $orderBy = "ORDER BY c.control_number DESC";
+        break;
+
+    case 'control_old': // oldest first
+        $orderBy = "ORDER BY c.control_number ASC";
+        break;
+
+    // NAME
+    case 'name_asc': // A-Z
+        $orderBy = "ORDER BY COALESCE(u.name, c.temp_name) COLLATE utf8mb4_general_ci ASC";
+        break;
+
+    case 'name_desc': // Z-A
+        $orderBy = "ORDER BY COALESCE(u.name, c.temp_name) COLLATE utf8mb4_general_ci DESC";
+        break;
+
+    default: // fallback
+        $orderBy = "ORDER BY c.created_at DESC";
+        break;
+}   
 /* ===== FETCH CERTIFICATES ===== */
 $sql = "
     SELECT 
@@ -135,7 +164,6 @@ $sql = "
         c.seminar_title,
         c.certificate_file,
         c.created_at,
-
         u.id AS user_id,
         u.name AS user_name,
         c.temp_name AS temp_name,
@@ -143,7 +171,7 @@ $sql = "
     FROM certificates c
     LEFT JOIN users u 
         ON c.teacher_id = u.id
-    ORDER BY c.created_at DESC
+    $orderBy
     LIMIT $rowsPerPage OFFSET $offset
 ";
 
@@ -499,17 +527,41 @@ button:hover { background:#084a6b; }
     }
 .dbutton {
     display: inline-block;       /* Makes it behave like a button */
-    padding: 10px 20px;          /* Space inside the button */
+    padding: 8px 25px;          /* Space inside the button */
     background-color: #28a745;   /* Button background color */
     color: white;                /* Text color */
     text-decoration: none;       /* Remove underline */
-    border-radius: 5px;          /* Rounded corners */
+    border-radius: 10px;          /* Rounded corners */
     font-weight: 600;            /* Bold text */
     transition: background 0.3s; /* Smooth hover effect */
 }
 
 .dbutton:hover {
     background-color: #218838;   /* Darker shade on hover */
+}
+
+/* Sorting Dropdown inside Table Header */
+th select {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 5px;
+    padding: 3px 6px;
+    font-size: 12px;
+    margin-left: 8px;
+    cursor: pointer;
+    outline: none;
+}
+
+/* Dropdown hover */
+th select:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+/* Dropdown options */
+th select option {
+    color: #000; /* options must be black or unreadable */
+    background: #fff;
 }
 </style>
 </head>
@@ -574,8 +626,29 @@ button:hover { background:#084a6b; }
         <?php $rowNumber = 1; ?>
         <tr>
              <th>No.</th>
-            <th>Control Number</th>
-            <th>Name</th>
+          <th>
+        Control Number
+        <select onchange="location = this.value;">
+            <option value="?page=1&rows=<?= $rowsPerPage ?>&sort=control_new"
+                <?= ($sort=='control_new')?'selected':'' ?>>New</option>
+            <option value="?page=1&rows=<?= $rowsPerPage ?>&sort=control_old"
+                <?= ($sort=='control_old')?'selected':'' ?>>Old</option>
+        </select>
+    </th>
+
+    <th>
+        Name
+        <select onchange="location = this.value;">
+            <option value="?page=1&rows=<?= $rowsPerPage ?>&sort=name_asc"
+                <?= ($sort=='name_asc')?'selected':'' ?>>
+                A - Z
+            </option>
+            <option value="?page=1&rows=<?= $rowsPerPage ?>&sort=name_desc"
+                <?= ($sort=='name_desc')?'selected':'' ?>>
+                Z - A
+            </option>
+    </select>
+</th>
             <th>Seminar/Workshop Attended</th>
             <th>Email</th>
             <th>Certificate</th>
@@ -624,12 +697,12 @@ button:hover { background:#084a6b; }
             <div class="footer-right">
                 <div class="row-select-wrapper">
                     Row per page: 
-                    <select onchange="location.href='?page=1&rows='+this.value">
-                        <option value="10" <?= $rowsPerPage==10 ? 'selected' : '' ?>>10</option>
-                        <option value="20" <?= $rowsPerPage==20 ? 'selected' : '' ?>>20</option>
-                        <option value="30" <?= $rowsPerPage==30 ? 'selected' : '' ?>>30</option>
-                        <option value="50" <?= $rowsPerPage==50 ? 'selected' : '' ?>>50</option>
-                    </select>
+                   <select onchange="location.href='?page=1&rows='+this.value">
+                    <option value="50" <?= $rowsPerPage==50 ? 'selected' : '' ?>>50</option>
+                    <option value="30" <?= $rowsPerPage==30 ? 'selected' : '' ?>>30</option>
+                    <option value="20" <?= $rowsPerPage==20 ? 'selected' : '' ?>>20</option>
+                    <option value="10" <?= $rowsPerPage==10 ? 'selected' : '' ?>>10</option>
+                </select>
                 </div>
 
                 <div class="pagination-controls">
