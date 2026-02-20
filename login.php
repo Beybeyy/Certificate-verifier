@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             justify-content: center;
             align-items: center;
             gap: 20px;
-            padding: 30px 10px 10px 10px; /* Spacing between nav and login card */
+            padding: 10px 10px 10px 10px; /* Spacing between nav and login card */
         }
 
         .logo-container img {

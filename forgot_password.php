@@ -225,8 +225,8 @@ body {
 
     <div class="nav-links" id="nav-menu">
         <a href="login.php">Login</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
+        <a href="about.php">About</a>
+        <a href="contact.php">Contact</a>
     </div>
 </nav>
 

@@ -170,7 +170,7 @@ if (isset($_GET['control_number'])) {
         /* ===== CARD ===== */
         .card {
             width: 100%;
-            max-width: 600px; /* Limits width on desktop */
+            max-width: 420px; /* Limits width on desktop */
             margin: 0 auto;   /* Ensures equal left/right margins */
             padding: 40px 45px;
             border: 1.8px solid #4a7fc2;
@@ -192,21 +192,45 @@ if (isset($_GET['control_number'])) {
 
         /* ===== SEARCH ROW ===== */
         .search-row {
-            display: flex;
-            gap: 10px;
+            display: flex !important;
+            flex-direction: row !important; /* Forces side-by-side even on small screens */
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
         }
 
-        .search-row input {
-            flex: 1;
-            padding: 12px 14px;
-            font-size: 15px;
+        .search-row input[type="text"] {
+    flex: 0 1 180px; /* Limits the width of the input box */
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #cfd8dc;
+    outline: none;
+    height: 38px;
+        }
+        
+        
+        /* Minimize the Submit and Reset buttons */
+        .search-row button[type="submit"], 
+        .search-row input[type="reset"] {
+            width: 75px !important; /* Specific small width */
+            height: 38px !important;
+            padding: 0 !important;
+            font-size: 13px;
+            font-weight: 500;
             border-radius: 6px;
-            border: 1px solid #cfd8dc;
-            outline: none;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0; /* Prevents buttons from squishing */
+            transition: background 0.2s ease;
         }
 
         .search-row button {
-            padding: 12px 20px;
+            padding: 12px 10px;
             font-size: 15px;
             border-radius: 6px;
             border: none;
@@ -391,14 +415,16 @@ if (isset($_GET['control_number'])) {
 <div class="page-wrapper">
     <div class="card">
         <h2>Certificate Verification</h2>
-        <p class="subtitle">Enter the control number to verify the certificate</p>
+        <p class="subtitle">Enter the control number to verify the certificate.
+        You can find your control number at the bottom right of your certificate.
+        </p>
 
         <form method="GET">
         <div class="search-row">
         <input type="text" name="control_number" placeholder="Enter Control Number"
         value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" autocomplete="off"required>   
         <button type="submit">Search</button>
-        <input type="reset" value="Reset" class="reset-btn" onclick="window.location='index.php'">   
+        <input type="reset" value="Clear" class="reset-btn" onclick="window.location='index.php'">   
          
         </a>
     </div>  
@@ -434,8 +460,8 @@ if (isset($_GET['control_number'])) {
 
         <hr class="divider">
 
-        <div class="login-text">You can find your control number at the bottom right of your certificate.</div>
-        <a href="login.php" class="login-link">Login</a>
+        
+        <a href="login.php" class="login-link">Login/Register</a>
     </div>
 </div>
 

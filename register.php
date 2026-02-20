@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            overflow-x: hidden; /* Prevents side-scrolling on mobile */
+            overflow-x: hidden;
         }
 
         /* ===== TOP NAV ===== */
@@ -120,8 +120,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-decoration: underline;
         }
 
-         /* ===== BURGER ICON & ANIMATION ===== */
-         .burger {
+         /* ===== LOGO SECTION ===== */
+         .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 10px 10px 10px; /* Spacing between nav and login card */
+        }
+
+        .logo-container img {
+            height: 140px; /* Adjust size to match your images */
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-container img[alt="Division Logo"] {
+            height: 90px; /* Smaller than the DepEd logo */
+        }
+
+
+       /* ===== BURGER ICON & ANIMATION ===== */
+       .burger {
             display: none;
             flex-direction: column;
             cursor: pointer;
@@ -216,10 +236,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 5px;
         }
         
-        /* ===== MOBILE RESPONSIVE LOGIC ===== */
-        @media (max-width: 768px) {
+         /* ===== MOBILE RESPONSIVE LOGIC ===== */
+        /*@media (max-width: 768px) {
             .top-nav {
                 padding: 15px 20px;
+            }*/
+
+            @media (max-width: 480px) {
+                .nav-links {
+                    width: 70%; /* Takes up more space on small phones */
+                }
             }
 
             .burger {
@@ -228,28 +254,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             .nav-links {
                 position: fixed;
-                right: -100%; /* Hidden off-screen to the right */
+                right: -100%; /* Hidden off-screen by default */
                 top: 0;
                 height: 100vh;
-                width: 30%; /* Menu takes 70% of screen width */
-                background-color: #0b4a82;
+                width: 190px; /* Fixed width for desktop consistency */
+                background-color: #0b4a82; /* Matches the blue-grey in your screenshot */
+                display: flex;
                 flex-direction: column;
-                justify-content: center;
-                gap: 30px;
+                justify-content: flex-start;
+                padding-top: 80px; 
+                gap: 0;
+                transition: 0.3s ease-in-out;
                 box-shadow: -5px 0 15px rgba(0,0,0,0.2);
             }
 
             .nav-links.active {
-                right: 0; /* Slide in */
+                right: 0;
             }
 
             .nav-links a {
                 margin: 0;
-                font-size: 20px;
+                padding: 20px 30px;
                 width: 100%;
-                text-align: center;
+                text-align: left;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                font-size: 18px;
             }
-        }
 
     </style>
 </head>
@@ -267,11 +297,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div class="nav-links" id="nav-menu">
-        <a href="#">Home</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
+        <a href="index.php">Home</a>
+        <a href="about.php">About</a>
+        <a href="contact.php">Contact</a>
     </div>
 </nav>
+
+<div class="logo-container">
+    <img src="img/logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Logo">
+    <img src="img/deped-csjdm-logo.png" alt="Division Logo">
+</div>
 
 <main class="register-wrapper">
     <div class="register-card">

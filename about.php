@@ -12,6 +12,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;  
+            font-family: "Segoe UI", Arial, sans-serif;;
         }
 
         body {
@@ -192,14 +193,14 @@
         }
 
         /* ===== FOOTER ===== */
-        .footer {
-            margin-top: 40px;
-            background-color: #e0e0e0;
-            padding: 50px 5%;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-        }
+        footer { 
+            background-color: #e6e6e6; 
+            padding: 30px; 
+            text-align: center; 
+            font-size: 0.8rem; 
+            border-top: 1px solid #ccc; 
+            margin-top: 50px; }
+        
 
         /* ===== MOBILE RESPONSIVE LOGIC ===== */
         /*@media (max-width: 768px) {
@@ -348,18 +349,11 @@
 </div>
 
 <!-- ===== FOOTER ===== -->
-<div class="footer">
-    <div>
-        <strong>Republic of the Philippines</strong><br>
-        All content is in the public domain unless otherwise stated.
-    </div>
-
-    <div>
-        <strong>About LIS</strong><br>
-        An official, web-based platform developed by the Department of Education to
-        systematically manage and maintain learner records in public schools.
-    </div>
-</div>
+<footer>
+    <p>Eco Park Muzon East, City of San Jose del Monte, Bulacan 3023, Philippines<br>
+    sanjosedelmonte.city@deped.gov.ph | (044) 305-7395<br>
+    <strong>DepEd Tayo City of San Jose del Monte</strong></p>
+</footer>
 
 <script>
     const burger = document.getElementById('burger');
