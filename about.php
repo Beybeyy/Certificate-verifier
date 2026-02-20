@@ -11,8 +11,7 @@
         * {
             box-sizing: border-box;
             margin: 0;
-            padding: 0;
-            font-family: "Segoe UI", Arial, sans-serif;;
+            padding: 0;  
         }
 
         body {
