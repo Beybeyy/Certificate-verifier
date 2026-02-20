@@ -85,7 +85,7 @@ body { margin:0; font-family:"Segoe UI", Arial, sans-serif; background:#fff; col
 .teacher-info p { font-size: 16px; color: #333; }
 
 /* Table */
-.table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 30px; }
+.table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 10px; }
 .cert-table { width: 100%; max-width: 1500px; margin: 0 auto; border-collapse: collapse; font-family: "Segoe UI", Arial, sans-serif; font-size: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); background: #fff; }
 .cert-table thead tr { background-color: #0b4a82; color: white; font-weight: 600; }
 .cert-table thead th { padding: 14px 18px; text-align: left; border: none; }
@@ -102,7 +102,7 @@ a.view-pdf:hover { text-decoration: underline; }
 .edit-btn:hover { background:#f57c00; }
 
 /* Pagination Footer */
-.pagination-footer { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background-color:#f8fbff; border:1px solid #e0e0e0; border-top:none; font-size:13px; flex-wrap:wrap; gap:10px; }
+.pagination-footer { display:flex; justify-content:space-between; align-items:center; padding:10px 1%0px; background-color:#f8fbff; border:1px solid #e0e0e0; border-top:none; font-size:13px; flex-wrap:wrap; gap:10px; }
 .footer-right { display:flex; align-items:center; gap:20px; }
 .row-select-wrapper { color:#5c7c99; font-size:13px; }
 .row-select-wrapper select { padding:2px 5px; border:1px solid #1976d2; border-radius:4px; color:#0b4a82; background:transparent; font-size:13px; margin-left:5px; }
