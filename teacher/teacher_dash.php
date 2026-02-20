@@ -172,6 +172,84 @@ a:hover { text-decoration:underline; }
   color: red;
 }
 
+/* Pagination Footer */
+.pagination-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px; /* Thinner padding */
+    background-color: #f8fbff; /* Very light blue tint */
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    font-size: 13px; /* Slightly smaller text */
+    color: #333;
+}
+
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.row-select-wrapper {
+    color: #5c7c99;
+    font-size: 13px;
+}
+
+.row-select-wrapper select {
+    padding: 2px 5px;
+    border: 1px solid #1976d2;
+    border-radius: 4px;
+    color: #0b4a82;
+    background: transparent;
+    font-size: 13px;
+    margin-left: 5px;
+}
+
+/* Compact Pagination Buttons */
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Tight gap between buttons */
+}
+
+.page-num, .page-arrow {
+    background: white;
+    border: 1px solid #cfd8dc;
+    color: #1976d2;
+    min-width: 28px; /* Fixed small width */
+    height: 28px;    /* Fixed small height */
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: 0.2s;
+}
+
+.page-num.active {
+    background: #1976d2;
+    border-color: #1976d2;
+    color: white;
+}
+
+.page-num:hover:not(.active), .page-arrow:hover {
+    background: #f0f7ff;
+    border-color: #1976d2;
+}
+
+.page-arrow {
+    font-size: 10px; /* Small arrows */
+    color: #78909c;
+}
+
+a { color:#0b4a82; font-weight:bold; text-decoration:none; }
+a:hover { text-decoration:underline; }
+.edit-btn { background:#ff9800; color:#fff; padding:5px 10px; border-radius:5px; }
+.edit-btn:hover { background:#f57c00; }
+
 /* Responsive */
 @media (max-width: 768px) {
     .cert-table {
@@ -253,6 +331,47 @@ a:hover { text-decoration:underline; }
             </tr>
         <?php endwhile; ?>
     </table>
+
+    <div class="pagination-footer">
+            <div class="footer-left">
+                <?php
+                $start = $offset + 1;
+                $end = min($offset + $rowsPerPage, $totalRows);
+                ?>
+                Showing <b><?= $start ?></b> to <b><?= $end ?></b> of <b><?= $totalRows ?></b> teachers
+            </div>
+            
+            <div class="footer-right">
+                <div class="row-select-wrapper">
+                    Row per page: 
+                    <select onchange="location.href='?page=1&rows='+this.value">
+                        <option value="10" <?= $rowsPerPage==10 ? 'selected' : '' ?>>10</option>
+                        <option value="20" <?= $rowsPerPage==20 ? 'selected' : '' ?>>20</option>
+                        <option value="30" <?= $rowsPerPage==30 ? 'selected' : '' ?>>30</option>
+                        <option value="50" <?= $rowsPerPage==50 ? 'selected' : '' ?>>50</option>
+                    </select>
+                </div>
+
+                <div class="pagination-controls">
+    <!-- Previous arrow -->
+            <a class="page-arrow" href="?page=<?= max(1, $page-1) ?>&rows=<?= $rowsPerPage ?>">❮</a>
+
+            <?php
+            $totalPages = ceil($totalRows / $rowsPerPage);
+            // Show up to 10 page numbers (adjustable)
+            $startPage = max(1, $page - 4);
+            $endPage = min($totalPages, $page + 5);
+
+            for ($i = $startPage; $i <= $endPage; $i++): ?>
+                <a class="page-num <?= $i==$page ? 'active' : '' ?>" href="?page=<?= $i ?>&rows=<?= $rowsPerPage ?>"><?= $i ?></a>
+            <?php endfor; ?>
+
+            <!-- Next arrow -->
+            <a class="page-arrow" href="?page=<?= min($totalPages, $page+1) ?>&rows=<?= $rowsPerPage ?>">❯</a>
+        </div>
+            </div>
+        </div>
+
     <?php else: ?>
     <p>No certificates found.</p>
     <?php endif; ?>
@@ -273,6 +392,27 @@ document.querySelectorAll('.nav-links a').forEach(link=>{
     });
 });
 
+// Function to handle clicking page numbers
+document.querySelectorAll('.page-num').forEach(button => {
+    button.addEventListener('click', function() {
+        // Remove active class from all
+        document.querySelectorAll('.page-num').forEach(b => b.classList.remove('active'));
+        // Add to clicked
+        this.classList.add('active');
+        
+        const page = parseInt(this.innerText);
+        console.log("Navigating to page: " + page);
+        // Add your logic to filter/load data for the specific page here
+    });
+});
+
+function prevPage() {
+    console.log("Previous Page Clicked");
+}
+
+function nextPage() {
+    console.log("Next Page Clicked");
+}
 
 </script>
 </body>

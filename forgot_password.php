@@ -111,6 +111,25 @@ body {
     font-weight: 500;
 }
 
+ /* ===== LOGO SECTION ===== */
+ .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 10px 10px 10px; /* Spacing between nav and login card */
+        }
+
+        .logo-container img {
+            height: 140px; /* Adjust size to match your images */
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-container img[alt="Division Logo"] {
+            height: 90px; /* Smaller than the DepEd logo */
+        }
+
 .burger {
     display: none;
     flex-direction: column;
@@ -149,7 +168,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 10px;
 }
 
 .card {
@@ -229,6 +248,11 @@ body {
         <a href="contact.php">Contact</a>
     </div>
 </nav>
+
+<div class="logo-container">
+    <img src="img/logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Logo">
+    <img src="img/deped-csjdm-logo.png" alt="Division Logo">
+</div>
 
 <main class="card-wrapper">
     <div class="card">
