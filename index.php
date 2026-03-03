@@ -187,7 +187,7 @@ if (isset($_GET['control_number'])) {
         <form method="GET">
             <div class="search-row">
                 <input type="text" name="control_number" placeholder="Enter Control Number"
-                       value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" required>
+                       value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" required autocomplete="off">
                 <div class="button-group">
                     <button type="submit" class="btn-search">Search</button>
                     <a href="index.php" class="reset-btn">Clear</a>
@@ -198,12 +198,13 @@ if (isset($_GET['control_number'])) {
         <?php if ($error): ?><div class="error"><?= $error ?></div><?php endif; ?>
 
         <?php if ($result && $row = $result->fetch_assoc()): ?>
-            <div class="result">
+            <div class="result">       
                 <p><strong>Status:</strong> ✅ Verified</p>
+                <p><strong>Control #:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
                 <p><strong>Name:</strong> <?= htmlspecialchars($row['display_name']) ?></p>
                 <p><strong>Seminar:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
-                <p><strong>Control #:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
-                <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank" style="color:#1976d2;">View Certificate</a>
+                
+                <!-- <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank" style="color:#1976d2;">View Certificate</a> -->
             </div>
         <?php endif; ?>
 
