@@ -193,6 +193,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .forgot-password { text-align: right; margin-bottom: 15px; }
         .forgot-password a { color: #0b4a82; font-size: 14px; text-decoration: none; }
 
+        .forgot-password a:hover {
+        color: #0b4a82; /* Changes to your brand blue */
+        
+        opacity: 0.8;
+        }
+
         .btn-login { 
             background-color: #0b4a82;
             color: white;
@@ -219,6 +225,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: inline-flex;
             align-items: center;
             gap: 5px;
+        }
+
+        .back-link:hover {
+            color: #0b4a82; /* Changes color to a lighter blue */
+            
+        }
+
+        .back-link:hover span {
+            transform: translateX(5px); /* Makes the arrow nudge to the left */
         }
 
         @keyframes fadeInUp {
