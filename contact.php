@@ -301,13 +301,6 @@
 
         <table id="table-1" class="hidden">
             <thead><tr><th>OFFICE / AREA</th><th>HEAD OF OFFICE</th><th>CONTACT INFO</th></tr></thead>
-            <tbody>
-            <tr>
-                <th>OFFICE / AREA</th>
-                <th>HEAD OF OFFICE</th>
-                <th>CONTACT INFORMATION</th>
-            </tr>
-        </thead>
         <tbody>
             <tr>
                 <td><span class="office-tag">CID Office</span>Office of the Curriculum and Implementation Division</td>
