@@ -184,32 +184,8 @@ if (isset($_GET['control_number'])) {
             </div>
         <?php endif; ?>
 
-<<<<<<< HEAD
         <hr style="border:0; border-top:1px solid #eee; margin:25px 0;">
         <a href="login.php" style="color:#1976d2; text-decoration:none; font-weight:600;">Login account</a>
-=======
-    // Email logic
-    $display_email = !empty($row['display_email'])
-        ? $row['display_email']
-        : 'No email';
-?>
-    <div class="result">
-        <p><strong>Name:</strong> <?= htmlspecialchars($display_name) ?></p>
-        <!-- <p><strong>Email:</strong> <?= htmlspecialchars($display_email) ?></p> -->
-        <p><strong>Seminar Title:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
-        <p><strong>Control Number:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
-        <p>
-            <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
-        </p>
-        <p><strong>Status:</strong> ✅ Verified</p>
-    </div>
-<?php endif; ?>
-
-        <hr class="divider">
-
-        
-        <a href="login.php" class="login-link">Login/Register</a>
->>>>>>> 7eddaa3283a3f1087ffa2fe6aa21e6409f805e24
     </div>
 </div>
 
