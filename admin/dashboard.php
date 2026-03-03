@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                 // CSV column order: control_number | name | seminar_title | teacher_email | certificate_file
                 [$control, $name, $title, $teacher_email, $certificate_file] = array_map('trim', $row);
 
-                if (!$control || !$name || !$title || !$teacher_email || !$certificate_file) {
+                if (!$control || !$name || !$title) {
                     $skipped++;
                     continue;
                 }
@@ -650,7 +650,7 @@ th select option {
     </select>
 </th>
             <th>Seminar/Workshop Attended</th>
-            <th>Email</th>
+            <!-- <th>Email</th> -->
             <th>Certificate</th>
             <th>Action</th>
         </tr>
@@ -670,13 +670,13 @@ th select option {
          </span>
 
                 <input type="text"
-                    class="name-input"
-                    value="<?= htmlspecialchars($row['temp_name'] ?? $row['user_name'] ?? explode('@', $row['display_email'])[0] ?? '') ?>"
+                        class="name-input"
+                        value="<?= htmlspecialchars($row['temp_name'] ?? $row['user_name'] ?? explode('@', $row['display_email'])[0] ?? '') ?>"
                     style="display:none; width:120px;">
 
             </td>
             <td><?= htmlspecialchars($row['seminar_title']) ?></td>
-            <td><?= htmlspecialchars($row['display_email'] ?? '') ?></td>
+            <!-- <td><?= htmlspecialchars($row['display_email'] ?? '') ?></td> -->
             <td><a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">Link</a></td>
             <td><button class="edit-btn" onclick="editName(this, <?= $row['cert_id'] ?>)">
                Edit

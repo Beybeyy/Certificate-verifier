@@ -448,7 +448,7 @@ if (isset($_GET['control_number'])) {
 ?>
     <div class="result">
         <p><strong>Name:</strong> <?= htmlspecialchars($display_name) ?></p>
-        <p><strong>Email:</strong> <?= htmlspecialchars($display_email) ?></p>
+        <!-- <p><strong>Email:</strong> <?= htmlspecialchars($display_email) ?></p> -->
         <p><strong>Seminar Title:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
         <p><strong>Control Number:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
         <p>
