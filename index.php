@@ -214,7 +214,7 @@ if (isset($_GET['control_number'])) {
 
 <footer>
     <div>© 2026 Department of Education Certificate Verifier System</div>
-    <div>Developed by: Larry Cruz and Bea Patrice Cortez</div>
+    <div>Developed by: Larry Cruz (Frontend) and Bea Patrice Cortez (Backend)</div>
 </footer>
 
 <script>
