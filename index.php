@@ -5,28 +5,20 @@ require_once __DIR__ . "/config/db.php";
 $result = null;
 $error = "";
 
-// Handle certificate search
 if (isset($_GET['control_number'])) {
     $control = trim($_GET['control_number']);
-
     if ($control !== "") {
-        // Prepare SQL: join only on teacher_id
         $stmt = $conn->prepare("
-            SELECT 
-                c.control_number,
-                c.seminar_title,
-                c.certificate_file,
-                COALESCE(u.name, c.temp_name) AS display_name,
-                COALESCE(u.email, c.teacher_email_pending) AS display_email
+            SELECT c.control_number, c.seminar_title, c.certificate_file,
+                   COALESCE(u.name, c.temp_name) AS display_name,
+                   COALESCE(u.email, c.teacher_email_pending) AS display_email
             FROM certificates c
-            LEFT JOIN users u 
-                ON c.teacher_id = u.id
+            LEFT JOIN users u ON c.teacher_id = u.id
             WHERE c.control_number = ?
         ");
         $stmt->bind_param("s", $control);
         $stmt->execute();
         $result = $stmt->get_result();
-
         if ($result->num_rows === 0) {
             $error = "❌ Certificate not found or invalid control number.";
         }
@@ -40,26 +32,23 @@ if (isset($_GET['control_number'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Certificate Verifier</title>
+    <title>Home | CerVer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link rel="icon" type="image/png" href="img/cerverlogo2.svg">
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; }
         body {
             margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #ffffff;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+            "Inter", sans-serif;  
+            background: #e4e4e6;
             color: #1a1a1a;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* ===== TOP NAV ===== */
+        /* ===== NAVIGATION (DESKTOP FIRST) ===== */
         .top-nav {
             background-color: #0b4a82;
             padding: 15px 40px;
@@ -70,338 +59,95 @@ if (isset($_GET['control_number'])) {
             position: relative;
             z-index: 1000;
         }
+        .nav-brand { font-size: 20px; font-weight: bold; line-height: 1.2; }
+        .nav-brand strong { font-size: 22px; font-weight: 300; }
 
-        .nav-brand {
-            font-size: 18px;
-            line-height: 1.2;
-            font-weight: 500;
-        }
+        /* Desktop Nav Links */
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a { color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 400; transition: 0.3s; }
+        .nav-links a:hover { opacity: 0.8; text-decoration: underline; }
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            transition: 0.3s ease-in-out;
-        }
+        /* Burger Hidden on Desktop */
+        .burger { display: none; flex-direction: column; cursor: pointer; gap: 5px; }
+        .burger span { height: 3px; width: 25px; background: white; border-radius: 3px; transition: 0.4s; }
 
-        .nav-links a {
-            color: #ffffff;
-            text-decoration: none;
-            margin-left: 35px;
-            font-size: 15px;
-            font-weight: 400;
-        }
+        /* ===== LOGOS & PAGE CONTENT ===== */
+        .logo-container { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px; }
+        .logo-container img { height: 100px; width: auto; object-fit: contain; }
 
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
-
-        /* ===== LOGO SECTION ===== */
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            padding: 10px 10px 10px 10px; /* Spacing between nav and login card */
-        }
-
-        .logo-container img {
-            height: 140px; /* Adjust size to match your images */
-            width: auto;
-            object-fit: contain;
-        }
-
-        .logo-container img[alt="Division Logo"] {
-            height: 90px; /* Smaller than the DepEd logo */
-        }
-
-
-       /* ===== BURGER ICON & ANIMATION ===== */
-       .burger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            gap: 5px;
-            z-index: 1001;
-        }
-
-        .burger span {
-            height: 3px;
-            width: 28px;
-            background: white;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-
-        /* Animation to transform burger into 'X' */
-        .burger.toggle span:nth-child(1) {
-            transform: rotate(-45deg) translate(-5px, 6px);
-        }
-        .burger.toggle span:nth-child(2) {
-            opacity: 0;
-        }
-        .burger.toggle span:nth-child(3) {
-            transform: rotate(45deg) translate(-5px, -6px);
-        }
-
-        /* ===== PAGE CENTER ===== */
-        .page-wrapper {
-            display: flex;
-            flex-direction: column; /* Stack vertically if needed, but here we use it to center */
-            align-items: center;
-            justify-content: flex-start; /* Keeps content from floating too low */
-            flex: 1;
-            padding: 0 20px 40px;
-        }
-
-        /* Optional: Improve Error/Result visibility */
-        .error {
-            color: #d32f2f;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-        .result {
-            margin-top: 20px;
-            text-align: center;
-            background: #f1f8ff;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        /* ===== CARD ===== */
+        .page-wrapper { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
         .card {
-            width: 100%;
-            max-width: 420px; /* Limits width on desktop */
-            margin: 0 auto;   /* Ensures equal left/right margins */
-            padding: 40px 45px;
-            border: 1.8px solid #4a7fc2;
-            border-radius: 16px;
-            text-align: center;
-            background-color: #fff;
+            width: 100%; max-width: 450px; padding: 40px; border-radius: 20px;
+            border: 1px solid #0b4a82; background: #fff; text-align: center;
+            animation: fadeInUp 0.6s ease-out;
         }
-        .card h2 {
-            margin: 0;
-            color: #123a6f;
-            font-size: 24px;
-        }
+        .card h2 { color: #123a6f; margin: 0 0 10px; }
+        .subtitle { color: #666; font-size: 14px; margin-bottom: 25px; }
 
-        .card p.subtitle {
-            margin: 10px 0 30px;
-            color: #666;
-            font-size: 14px;
+        /* Search Layout */
+        .search-row { display: flex; flex-direction: column; gap: 12px; }
+        .search-row input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
+        .button-group { display: flex; gap: 10px; }
+        .button-group button, .reset-btn {
+            flex: 1; padding: 12px; border: none; border-radius: 8px;
+            cursor: pointer; font-weight: 600; text-decoration: none; color: white;
         }
+        .btn-search { background: #1976d2; }
+        .reset-btn { background: #e74c3c; display: flex; justify-content: center; align-items: center; }
 
-        /* ===== SEARCH ROW ===== */
-        .search-row {
-            display: flex !important;
-            flex-direction: row !important; /* Forces side-by-side even on small screens */
-            gap: 8px;
-            justify-content: center;
-            align-items: center;
-            margin-top: 15px;
-        }
-
-        .search-row input[type="text"] {
-    flex: 0 1 180px; /* Limits the width of the input box */
-    padding: 8px 12px;
-    font-size: 14px;
-    border-radius: 6px;
-    border: 1px solid #cfd8dc;
-    outline: none;
-    height: 38px;
-        }
+        /* Results */
+        .result { margin-top: 20px; padding: 15px; background: #f1f8ff; border-radius: 8px; text-align: left; }
+        .error { color: #d32f2f; margin-top: 15px; font-weight: bold; }
         
-        
-        /* Minimize the Submit and Reset buttons */
-        .search-row button[type="submit"], 
-        .search-row input[type="reset"] {
-            width: 75px !important; /* Specific small width */
-            height: 38px !important;
-            padding: 0 !important;
-            font-size: 13px;
-            font-weight: 500;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            flex-shrink: 0; /* Prevents buttons from squishing */
-            transition: background 0.2s ease;
+        footer {
+            background: #fff; padding: 20px 40px; border-top: 1px solid #ccc;
+            display: flex; justify-content: space-between; font-size: 13px; margin-top: auto;
         }
 
-        .search-row button {
-            padding: 12px 10px;
-            font-size: 15px;
-            border-radius: 6px;
-            border: none;
-            background: #1976d2;
-            color: #ffffff;
-            cursor: pointer;
-        }
-
-        .search-row button:hover {
-            background: #155fa8;
-        }
-
-        /* ===== DIVIDER ===== */
-        .divider {
-            margin: 28px 0 18px;
-            border: none;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        /* ===== LOGIN ===== */
-        .login-text {
-            font-size: 14px;
-            margin-bottom: 6px;
-        }
-
-        .login-link {
-            font-size: 14px;
-            color: #1976d2;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .login-link:hover {
-            text-decoration: underline;
-        }
-
-        /* ===== MOBILE RESPONSIVE LOGIC ===== */
-        /*@media (max-width: 768px) {
-            .top-nav {
-                padding: 15px 20px;
-            }*/
-
-            @media (max-width: 480px) {
-                .nav-links {
-                    width: 70%; /* Takes up more space on small phones */
-                }
-            }
-
-            .burger {
-                display: flex;
-            }
-
+        /* ===== RESPONSIVE (MOBILE) ===== */
+        @media (max-width: 768px) {
+            .top-nav { padding: 15px 20px; }
+            .burger { display: flex; } /* Show Burger */
             .nav-links {
-                position: fixed;
-                right: -100%; /* Hidden off-screen by default */
-                top: 0;
-                height: 100vh;
-                width: 190px; /* Fixed width for desktop consistency */
-                background-color: #0b4a82; /* Matches the blue-grey in your screenshot */
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                padding-top: 80px; 
-                gap: 0;
-                transition: 0.3s ease-in-out;
-                box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+                position: fixed; right: -100%; top: 0; height: 100vh; width: 200px;
+                background: #0b4a82; flex-direction: column; padding: 80px 20px;
+                transition: 0.4s ease-in-out; box-shadow: -5px 0 15px rgba(0,0,0,0.2);
             }
-
-            .nav-links.active {
-                right: 0;
-            }
-
-            .nav-links a {
-                margin: 0;
-                padding: 20px 30px;
-                width: 100%;
-                text-align: left;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-                font-size: 18px;
-            }
-
-                    /* Make page wrapper flexible */
-            .page-wrapper {
-                height: auto; /* Remove fixed height calculation */
-                min-height: auto; 
-                padding: 20px 15px; /* Add breathing room on sides */
-                align-items: flex-start; /* Align to top so it doesn't float in middle */
-            }
-
-            /* Ensure the card fits the screen width */
-            .card {
-                width: 100%;
-                max-width: 650px; /* Slightly wider to match your image */
-                margin: 0 auto;   /* Perfect horizontal centering */
-                padding: 50px 40px;
-                border: 1px solid #0b4a82; /* Thin blue border from image */
-                border-radius: 30px; /* Rounded corners from image */
-                text-align: center;
-                background: #ffffff;
-                box-shadow: none; /* Keep it flat and clean like the image */
-            }
-
-            /* Adjust search row for small screens */
-            .search-row {
-                flex-direction: column;
-            }
-
-            .search-row button {
-                width: 100%;
-            }
-             .burger.reset-icon {
-                font-size: 18px;
-                text-decoration: none;
-                color: #888;
-                padding: 8px;
-                border-radius: 50%;
-                transition: 0.2s ease;
-            }
-
-            .reset-icon:hover {
-                background-color: #f0f0f0;
-                color: #d00000;
-            }
-            .burger {
-                display: flex;
-                flex-direction: column;
-                cursor: pointer;
-                gap: 5px;
-                z-index: 1000;
-            }
-
-            .reset-btn {
-            background-color: #e74c3c; /* Red */
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            /* Darker red shadow */
+            .nav-links.active { right: 0; } /* Slide in */
+            .nav-links a { font-size: 18px; width: 100%; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            
+            /* Burger Animation to X */
+            .burger.toggle span:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
+            .burger.toggle span:nth-child(2) { opacity: 0; }
+            .burger.toggle span:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
+            
+            footer { flex-direction: column; text-align: center; gap: 10px; }
         }
 
-        /* Hover effect */
-        .reset-btn:hover {
-            background-color: #ff5c5c;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-       
-        
     </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
 <nav class="top-nav">
     <div class="nav-brand">
-        Department of Education<br>
-        Certificate Verifier
+        DEPARTMENT OF EDUCATION<br>
+        <strong>CerVer - Certificate Verifier</strong>
+    </div>
+
+    <div class="nav-links" id="nav-menu">
+        <a href="index.php">Home</a>
+        <a href="about.php">About</a>
+        <a href="contact.php">Contact</a>
     </div>
 
     <div class="burger" id="burger">
         <span></span>
         <span></span>
         <span></span>
-    </div>
-
-    <div class="nav-links" id="nav-menu">
-        <a href="#">Home</a>
-        <a href="about.php">About</a>
-        <a href="contact.php">Contact</a>
     </div>
 </nav>
 
@@ -410,79 +156,53 @@ if (isset($_GET['control_number'])) {
     <img src="img/deped-csjdm-logo.png" alt="Division Logo">
 </div>
 
-
-<!-- CENTER CONTENT -->
 <div class="page-wrapper">
     <div class="card">
         <h2>Certificate Verification</h2>
-        <p class="subtitle">Enter the control number to verify the certificate.
-        You can find your control number at the bottom right of your certificate.
-        </p>
+        <p class="subtitle">Enter the control number to verify the certificate.</p>
 
         <form method="GET">
-        <div class="search-row">
-        <input type="text" name="control_number" placeholder="Enter Control Number"
-        value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" autocomplete="off"required>   
-        <button type="submit">Search</button>
-        <input type="reset" value="Clear" class="reset-btn" onclick="window.location='index.php'">   
-         
-        </a>
-    </div>  
-</form>
-    <?php if ($error): ?>
-    <div class="error"><?= htmlspecialchars($error) ?></div>
-<?php endif; ?>
+            <div class="search-row">
+                <input type="text" name="control_number" placeholder="Enter Control Number"
+                       value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" required>
+                <div class="button-group">
+                    <button type="submit" class="btn-search">Search</button>
+                    <a href="index.php" class="reset-btn">Clear</a>
+                </div>
+            </div>
+        </form>
 
-<?php if ($result && $result->num_rows > 0): 
-    $row = $result->fetch_assoc();
+        <?php if ($error): ?><div class="error"><?= $error ?></div><?php endif; ?>
 
-    // Name logic same as admin dashboard
-    $display_name = !empty($row['display_name'])
-        ? $row['display_name']
-        : (!empty($row['display_email']) ? explode('@', $row['display_email'])[0] : 'Not registered');
+        <?php if ($result && $row = $result->fetch_assoc()): ?>
+            <div class="result">
+                <p><strong>Status:</strong> ✅ Verified</p>
+                <p><strong>Name:</strong> <?= htmlspecialchars($row['display_name']) ?></p>
+                <p><strong>Seminar:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
+                <p><strong>Control #:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
+                <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank" style="color:#1976d2;">View Certificate</a>
+            </div>
+        <?php endif; ?>
 
-    // Email logic
-    $display_email = !empty($row['display_email'])
-        ? $row['display_email']
-        : 'No email';
-?>
-    <div class="result">
-        <p><strong>Name:</strong> <?= htmlspecialchars($display_name) ?></p>
-        <p><strong>Email:</strong> <?= htmlspecialchars($display_email) ?></p>
-        <p><strong>Seminar Title:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
-        <p><strong>Control Number:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
-        <p>
-            <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
-        </p>
-        <p><strong>Status:</strong> ✅ Verified</p>
-    </div>
-<?php endif; ?>
-
-        <hr class="divider">
-
-        
-        <a href="login.php" class="login-link">Login/Register</a>
+        <hr style="border:0; border-top:1px solid #eee; margin:25px 0;">
+        <a href="login.php" style="color:#1976d2; text-decoration:none; font-weight:600;">Login account</a>
     </div>
 </div>
 
-        <script>
-            const burger = document.getElementById('burger');
+<footer>
+    <div>© 2026 Department of Education Certificate Verifier System</div>
+    <div>Developed by: Larry Cruz and Bea Patrice Cortez</div>
+</footer>
+
+<script>
+    const burger = document.getElementById('burger');
     const navMenu = document.getElementById('nav-menu');
 
-    // Toggle menu and burger animation
     burger.addEventListener('click', () => {
         navMenu.classList.toggle('active');
         burger.classList.toggle('toggle');
     });
-
-    // Close menu when a link is clicked (useful for mobile)
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('active');
-            burger.classList.remove('toggle');
-        });
-    });
-        </script>
+</script>
 
 </body>
 </html>

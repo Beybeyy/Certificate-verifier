@@ -185,8 +185,11 @@ $result = $conn->query($sql);
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin Dashboard</title>
+
+<title>Admin Dashboard | CerVer - Certificate Verifier</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="img/cerverlogo2.svg">
+
 <style>
 /* General */
 body { margin:0; font-family:"Segoe UI", Arial, sans-serif; background:#fff; color:#1a1a1a; display:flex; flex-direction:column; min-height:100vh; overflow-x:hidden; }

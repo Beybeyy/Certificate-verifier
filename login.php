@@ -22,14 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $login_ok = false;
 
             if (!empty($db_password)) {
-                // Hashed password
+                // Check if password is already hashed
                 if (password_get_info($db_password)['algo'] !== 0) {
                     if (password_verify($password, $db_password)) $login_ok = true;
                 } else {
-                    // Plain text password
+                    // Plain text password (for migration)
                     if ($password === $db_password) {
                         $login_ok = true;
-                        // Hash the plain password and update DB
+                        // Hash the plain password and update DB for security
                         $hashed = password_hash($password, PASSWORD_DEFAULT);
                         $stmt_update = $conn->prepare("UPDATE users SET password=? WHERE id=?");
                         $stmt_update->bind_param("si", $hashed, $user['id']);
@@ -64,26 +64,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Certificate Verifier</title>
+    <title>Login | CerVer - Certificate Verifier</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/cerverlogo2.svg">
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #ffffff;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+            background: #e4e4e6;
             color: #1a1a1a;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            overflow-x: hidden; /* Prevents side-scrolling on mobile */
+            overflow-x: hidden;
         }
 
-        /* ===== TOP NAV ===== */
+        /* ===== TOP NAV (Identical to Index) ===== */
         .top-nav {
             background-color: #0b4a82;
             padding: 15px 40px;
@@ -96,49 +95,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .nav-brand {
-            font-size: 18px;
+            font-size: 20px;
+            font-weight: bold;
             line-height: 1.2;
-            font-weight: 500;
+        }
+
+        .nav-brand strong {
+            font-size: 22px;
+            font-weight: 300;
         }
 
         .nav-links {
             display: flex;
+            gap: 30px;
             align-items: center;
-            transition: 0.3s ease-in-out;
         }
 
         .nav-links a {
             color: #ffffff;
             text-decoration: none;
-            margin-left: 35px;
             font-size: 15px;
             font-weight: 400;
+            transition: 0.3s;
         }
 
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
+        .nav-links a:hover { opacity: 0.8; text-decoration: underline; }
 
-        /* ===== LOGO SECTION ===== */
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            padding: 10px 10px 10px 10px; /* Spacing between nav and login card */
-        }
-
-        .logo-container img {
-            height: 140px; /* Adjust size to match your images */
-            width: auto;
-            object-fit: contain;
-        }
-
-        .logo-container img[alt="Division Logo"] {
-            height: 90px; /* Smaller than the DepEd logo */
-        }
-
-        /* ===== BURGER ICON & ANIMATION ===== */
         .burger {
             display: none;
             flex-direction: column;
@@ -149,203 +131,158 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .burger span {
             height: 3px;
-            width: 28px;
+            width: 25px;
             background: white;
-            border-radius: 5px;
-            transition: all 0.3s ease;
+            border-radius: 3px;
+            transition: 0.4s;
         }
 
-        /* Animation to transform burger into 'X' */
-        .burger.toggle span:nth-child(1) {
-            transform: rotate(-45deg) translate(-5px, 6px);
-        }
-        .burger.toggle span:nth-child(2) {
-            opacity: 0;
-        }
-        .burger.toggle span:nth-child(3) {
-            transform: rotate(45deg) translate(-5px, -6px);
+        /* ===== LOGO SECTION (Identical to Index) ===== */
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
         }
 
-        
+        .logo-container img {
+            height: 100px;
+            width: auto;
+            object-fit: contain;
+        }
 
-        /* ===== LOGIN CONTAINER ===== */
+        /* ===== LOGIN CARD ===== */
         .login-wrapper {
             flex: 1;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             padding: 20px;
         }
 
         .login-card {
             width: 100%;
             max-width: 420px;
-            border: 1.5px solid #0056b3;
+            border: 1px solid #0b4a82;
             border-radius: 20px;
             padding: 40px 30px;
             text-align: center;
             background: #fff;
+            animation: fadeInUp 0.6s ease-out forwards;
         }
 
         .login-card h2 {
-            color: #004085;
-            margin-bottom: 25px;
+            color: #0b4a82;
+            margin: 0 0 25px;
             font-size: 24px;
         }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
-
+        .form-group { margin-bottom: 15px; text-align: left; }
+        
         .form-group input {
             width: 100%;
             padding: 12px;
-            border: 1.2px solid #8ba8c7;
+            border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 16px;
         }
-                .forgot-password {
-            text-align: right;
-            margin-bottom: 8px;
-        }
 
-        .forgot-password a {
-            color: #0056b3;
-            font-size: 14px;
-            text-decoration: none;
-        }
+        .error { color: #d32f2f; margin-bottom: 15px; font-weight: bold; font-size: 14px; }
 
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
+        .forgot-password { text-align: right; margin-bottom: 15px; }
+        .forgot-password a { color: #0b4a82; font-size: 14px; text-decoration: none; }
 
-        /* ===== BUTTONS ===== */
-        .btn-upload {
-            background-color: #d3d3d3; /* Gray by default */
-            color: #777;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: not-allowed;
-            margin-bottom: 15px;
-            transition: 0.3s;
-        }
-
-        .btn-upload.admin-active {
-            background-color: #28a745; /* Green */
-            color: white;
-            cursor: pointer;
-        }
-
-        .btn-login {
-            background-color: #0056b3;
+        .btn-login { 
+            background-color: #0b4a82;
             color: white;
             border: none;
-            padding: 12px 40px;
+            padding: 12px;
             border-radius: 8px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             width: 100%;
-            display: block;
-            margin-bottom: 10px;
+            transition: 0.3s;
+            margin-bottom: 15px;
         }
 
-        /* ===== NEW REGISTRATION TEXT STYLING ===== */
-        .register-text {
-            font-size: 15px;
-            margin-bottom: 9px;
-            color: #1a1a1a;
-            font-weight: 500;
-        }
+        .btn-login:hover { background-color: #004085; }
 
-        .register-text a {
-            color: #0b4a82;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .register-text a:hover {
-            text-decoration: underline;
-        }
+        .register-text { font-size: 14px; margin-bottom: 20px; }
+        .register-text a { color: #0b4a82; text-decoration: none; font-weight: 600; }
 
         .back-link {
             text-decoration: none;
-            color: #0b4a82;
+            color: #666;
             font-size: 14px;
-            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            position: relative;
-            top: -7px;
         }
 
-       /* ===== MOBILE RESPONSIVE LOGIC ===== */
-        /*@media (max-width: 768px) {
-            .top-nav {
-                padding: 15px 20px;
-            }*/
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-            @media (max-width: 480px) {
-                .nav-links {
-                    width: 70%; /* Takes up more space on small phones */
-                }
-            }
+        /* ===== FOOTER ===== */
+        footer { 
+            background-color: #fff; 
+            padding: 20px 40px; 
+            font-size: 13px; 
+            border-top: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: auto;
+        }
 
-            .burger {
-                display: flex;
-            }
-
+        /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .top-nav { padding: 15px 20px; }
+            .burger { display: flex; }
             .nav-links {
                 position: fixed;
-                right: -100%; /* Hidden off-screen by default */
+                right: -100%;
                 top: 0;
                 height: 100vh;
-                width: 190px; /* Fixed width for desktop consistency */
-                background-color: #0b4a82; /* Matches the blue-grey in your screenshot */
-                display: flex;
+                width: 200px;
+                background: #0b4a82;
                 flex-direction: column;
-                justify-content: flex-start;
-                padding-top: 80px; 
-                gap: 0;
-                transition: 0.3s ease-in-out;
+                padding: 80px 20px;
+                transition: 0.4s ease-in-out;
                 box-shadow: -5px 0 15px rgba(0,0,0,0.2);
             }
+            .nav-links.active { right: 0; }
+            .nav-links a { font-size: 18px; width: 100%; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            
+            .burger.toggle span:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
+            .burger.toggle span:nth-child(2) { opacity: 0; }
+            .burger.toggle span:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
 
-            .nav-links.active {
-                right: 0;
-            }
-
-            .nav-links a {
-                margin: 0;
-                padding: 20px 30px;
-                width: 100%;
-                text-align: left;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-                font-size: 18px;
-            }
-        
+            footer { flex-direction: column; text-align: center; gap: 10px; }
+        }
     </style>
 </head>
 <body>
 
 <nav class="top-nav">
     <div class="nav-brand">
-        Department of Education<br>
-        Certificate Verifier
-    </div>
-
-    <div class="burger" id="burger">
-        <span></span>
-        <span></span>
-        <span></span>
+        DEPARTMENT OF EDUCATION<br>
+        <strong>CerVer - Certificate Verifier</strong>
     </div>
 
     <div class="nav-links" id="nav-menu">
         <a href="index.php">Home</a>
         <a href="about.php">About</a>
         <a href="contact.php">Contact</a>
+    </div>
+
+    <div class="burger" id="burger">
+        <span></span>
+        <span></span>
+        <span></span>
     </div>
 </nav>
 
@@ -357,41 +294,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <main class="login-wrapper">
     <div class="login-card">
         <h2>Login</h2>
-         <?php if($error) echo "<div class='error'>$error</div>"; ?>
+        
+        <?php if($error): ?>
+            <div class="error"><?= $error ?></div>
+        <?php endif; ?>
 
-            <form method="POST">
+        <form method="POST">
             <div class="form-group">
-                <input type="email" name="email" placeholder="Enter your email" required autocomplete="off">
+                <input type="email" name="email" placeholder="Email Address" required autocomplete="off">
             </div>
             <div class="form-group">
-                <input type="password" name="password" placeholder="Enter your password" required autocomplete="off">
+                <input type="password" name="password" placeholder="Password" required autocomplete="off">
             </div>
-             <div class="forgot-password">
+            
+            <div class="forgot-password">
                 <a href="forgot_password.php">Forgot Password?</a>
             </div>
 
             <button type="submit" class="btn-login">Login</button>
 
-            <div class="register-text">Don't have an account? <br><a href="register.php">Register here</a> </div>
+            <!--div class="register-text">
+            Don't have an account? <a href="register.php">Register here</a>
+            </div>-->
              
             <a href="index.php" class="back-link">
-                <span>&lt;</span> back to verifier
+                <span>&larr;</span> Back to Verifier
             </a>
         </form>
     </div>
 </main>
 
+<footer>
+    <div class="footer-left">
+        © 2026 Department of Education Certificate Verifier System
+    </div>
+    <div class="footer-right">
+        Developed by: Larry Cruz and Bea Patrice Cortez
+    </div>
+</footer>
+
 <script>
     const burger = document.getElementById('burger');
     const navMenu = document.getElementById('nav-menu');
 
-    // Toggle menu and burger animation
     burger.addEventListener('click', () => {
         navMenu.classList.toggle('active');
         burger.classList.toggle('toggle');
     });
 
-    // Close menu when a link is clicked (useful for mobile)
+    // Close menu when a link is clicked
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
             navMenu.classList.remove('active');

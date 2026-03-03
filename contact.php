@@ -2,105 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Contact Us | CerVer - Certificate Verifier</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DepEd Certificate Verifier - Contact Us</title>
+    <link rel="icon" type="image/png" href="img/cerverlogo2.svg">
+
     <style>
-         * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: "Segoe UI", Arial, sans-serif;;
-        }
+        /* Unified Global Styles from About Page */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: #ffffff;
-            color: #000;
-            
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #e4e4e6;
+            color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-          /* NAVBAR */
-          .top-nav {
-            background-color: #0b3c78;
+        /* ===== TOP NAV (Exact Match) ===== */
+        .top-nav {
+            background-color: #0b4a82;
             padding: 15px 40px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
             align-items: center;
-            color: white;
+            color: #ffffff;
             position: relative;
             z-index: 1000;
         }
 
-        /* Left Brand Side */
         .nav-brand {
-            text-align: left;
-            line-height: 1.2;
-            margin-left: 20px;
+            font-size: 20px;
             font-weight: bold;
-            font-size: 18px;
+            line-height: 1.2;
         }
 
-        .nav-brand small {
-            font-weight: normal;
-            font-size: 14px;
-            opacity: 0.9;
+        .nav-brand strong {
+            font-size: 22px;
+            font-weight: 300;
         }
 
         .nav-links {
             display: flex;
+            gap: 30px;
             align-items: center;
-            transition: 0.3s ease-in-out;
         }
 
-        .top-nav a {
-            color: #fff;
+        .nav-links a {
+            color: #ffffff;
             text-decoration: none;
-            margin: 0 20px;
-            font-size: 16px;
-            font-weight: 400;
+            font-size: 15px;
+            transition: 0.3s;
         }
 
-        .top-nav a:hover {
-            text-decoration: underline;
-        }
-        
-        .login-btn {
-            background-color: #0056b3;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            display: block;
-            margin-bottom: 20px;
-        }
-       
-        .container { width: 95%; max-width: 1200px; margin: 40px auto; }
+        .nav-links a:hover { opacity: 0.8; text-decoration: underline; }
 
-        /* Contact Info Section */
-        .contact-header { display: flex; justify-content: space-between; margin-bottom: 30px; gap: 20px; }
-        .contact-text h2 { font-size: 2rem; margin-top: 0; color: #004080; }
-        .map-box { width: 400px; height: 200px; border: 1px solid #ccc; background: #f9f9f9; flex-shrink: 0; }
-
-        /* Table Tabs */
-        .tabs { display: flex; border-bottom: 2px solid #00a0e3; flex-wrap: wrap; }
-        .tab { padding: 12px 20px; background: #eee; border: 1px solid #ccc; margin-right: 5px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: 0.3s; }
-        .tab:hover { background: #e0e0e0; }
-        .tab.active { background: #00a0e3; color: white; border-bottom: none; }
-
-        /* Table Styling */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; border: 2px solid #00a0e3; }
-        th { background-color: #004080 ; color: white; padding: 12px; text-align: left; font-size: 0.9rem; border: 1px solid #ddd; }
-        td { padding: 10px; border: 1px solid #ddd; font-size: 0.82rem; vertical-align: top; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        .hidden { display: none; }
-        .office-tag { display: block; font-weight: bold; color: #004080; margin-bottom: 4px; }
-
-         /* ===== BURGER ICON & ANIMATION ===== */
         .burger {
-            display: flex ;
+            display: none;
             flex-direction: column;
             cursor: pointer;
             gap: 5px;
@@ -109,144 +68,185 @@
 
         .burger span {
             height: 3px;
-            width: 28px;
+            width: 25px;
             background: white;
-            border-radius: 5px;
-            transition: all 0.3s ease;
+            border-radius: 3px;
+            transition: 0.4s;
         }
 
-        /* Animation to transform burger into 'X' */
-        .burger.toggle span:nth-child(1) {
-            transform: rotate(-45deg) translate(-5px, 6px);
-        }
-        .burger.toggle span:nth-child(2) {
-            opacity: 0;
-        }
-        .burger.toggle span:nth-child(3) {
-            transform: rotate(45deg) translate(-5px, -6px);
+        /* ===== MAIN CONTENT ===== */
+        .container {
+            max-width: 1120px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
         }
 
-        /* ===== RIGHT SIDEBAR ===== */
-        .sidebar {
-            flex: .7;
-            margin-right: 150px;
-            border: 1px solid #8aa6c1;
-            padding: 15px;
-            height: fit-content;
+        h2 {
+            font-size: 32px;
+            color: #0b4a82;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0b4a82;
+            display: inline-block;
+            padding-bottom: 5px;
         }
 
-        .sidebar h3 {
-            font-size: 16px;
-            margin-bottom: 10px;
+        .content-box {
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid #0b4a82;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
         }
 
-        .sidebar a {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #0b4a8b;
-            text-decoration: none;
+        /* Contact Header Layout */
+        .contact-header { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 40px; 
+            margin-bottom: 30px;
         }
-        .sidebar a:hover {
-            text-decoration: underline;
-        }
-
-        /* Footer */
-        footer { background-color: #e6e6e6; padding: 30px; text-align: center; font-size: 0.8rem; border-top: 1px solid #ccc; margin-top: 50px; }
         
-        /* ===== MOBILE RESPONSIVE LOGIC ===== */
-        /*@media (max-width: 768px) {
-            .top-nav {
-                padding: 15px 20px;
-            }*/
+        .contact-text { flex: 1; line-height: 1.8; }
+        .contact-text p { margin-bottom: 15px; }
 
-            @media (max-width: 480px) {
-                .nav-links {
-                    width: 70%; /* Takes up more space on small phones */
-                }
-            }
+        .map-box { 
+            flex: 1; 
+            height: 250px; 
+            border: 1px solid #ddd; 
+            border-radius: 10px; 
+            overflow: hidden; 
+        }
 
-            .burger {
-                display: flex;
-            }
+        /* Table Tabs */
+        .tabs { 
+            display: flex; 
+            gap: 5px; 
+            margin-bottom: -1px; 
+            overflow-x: auto;
+        }
+        
+        .tab { 
+            padding: 12px 20px; 
+            background: #eee; 
+            border: 1px solid #0b4a82; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: bold; 
+            border-radius: 10px 10px 0 0;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab.active { background: #0b4a82; color: white; }
 
+        /* Table Styling */
+        .table-container { background: #fff; border: 1px solid #0b4a82; border-radius: 0 10px 10px 10px; overflow: hidden; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { background-color: #0b4a82; color: white; padding: 15px; text-align: left; font-size: 14px; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; vertical-align: top; }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        
+        .hidden { display: none; }
+        .office-tag { display: block; font-weight: bold; color: #0b4a82; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; }
+
+        /* ===== FOOTER ===== */
+        footer { 
+            background-color: #fff; 
+            padding: 20px 40px; 
+            font-size: 13px; 
+            border-top: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .contact-header { flex-direction: column; }
+            .map-box { width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .top-nav { padding: 15px 20px; }
+            .burger { display: flex; }
             .nav-links {
                 position: fixed;
-                right: -100%; /* Hidden off-screen by default */
+                right: -100%;
                 top: 0;
                 height: 100vh;
-                width: 190px; /* Fixed width for desktop consistency */
-                background-color: #0b4a82; /* Matches the blue-grey in your screenshot */
-                display: flex;
+                width: 200px;
+                background: #0b4a82;
                 flex-direction: column;
-                justify-content: flex-start;
-                padding-top: 80px; 
-                gap: 0;
-                transition: 0.3s ease-in-out;
-                box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+                padding: 80px 20px;
+                transition: 0.4s ease-in-out;
+                z-index: 999;
             }
+            .nav-links.active { right: 0; }
+            .nav-links a { font-size: 18px; width: 100%; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            
+            .burger.toggle span:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
+            .burger.toggle span:nth-child(2) { opacity: 0; }
+            .burger.toggle span:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
 
-            .nav-links.active {
-                right: 0;
-            }
-
-            .nav-links a {
-                margin: 0;
-                padding: 20px 30px;
-                width: 100%;
-                text-align: left;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-                font-size: 18px;
-            }
-   </style>
+            footer { flex-direction: column; text-align: center; gap: 10px; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- ===== NAVBAR ===== -->
-<div class="top-nav">
-        <div class="nav-brand">
-            Department of Education<br>
-            <small>Learning Information System</small>
-        </div>
-
-        <div class="burger" id="burger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-       
-        <div class="nav-links" id="nav-menu">
-            <a href="index.php">Home</a>
-            <a href="about.php">About</a>
-            <a href="contact.php">Contact</a>
-            <a href="login.php">Login</a>
-            </div>    
+<nav class="top-nav">
+    <div class="nav-brand">
+        DEPARTMENT OF EDUCATION<br>
+        <strong>CerVer - Certificate Verifier</strong>
     </div>
 
+    <div class="burger" id="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="nav-links" id="nav-menu">
+        <a href="index.php">Home</a>
+        <a href="about.php">About</a>
+        <a href="contact.php">Contact</a>
+    </div>
+</nav>
+
 <div class="container">
-    <div class="contact-header">
-        <div class="contact-text">
-            <h2>Contact Us</h2>
-            <p><strong>CONTACT</strong><br>
-            sanjosedelmonte.city@deped.gov.ph</p>
-            <p><strong>ADDRESS</strong><br>
-            Eco Park, Muzon East, City of San Jose del Monte, Bulacan</p>
-        </div>
-        <div class="map-box">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3856.848803157297!2d121.0560!3d14.8143!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397bd08bb8b220b%3A0x11e6d66e6c46ec8e!2sSchools%20Division%20Office%20of%20City%20of%20San%20Jose%20del%20Monte!5e0!3m2!1sen!2sph!4v1700000000000" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    <h2>Contact Us</h2> 
+
+    <div class="content-box">
+        <div class="contact-header">
+            <div class="contact-text">
+                <p><strong>EMAIL</strong><br>
+                sanjosedelmonte.city@deped.gov.ph</p>
+                <p><strong>ADDRESS</strong><br>
+                Eco Park, Muzon East, City of San Jose del Monte, Bulacan</p>
+            </div>
+            <div class="map-box">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3856.884704332454!2d121.0422!3d14.8144!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTTCsDQ4JzUxLjgiTiAxMjHCsDAyJzMxLjkiRQ!5e0!3m2!1sen!2sph!4v1614741234567!5m2!1sen!2sph" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
         </div>
     </div>
 
     <div class="tabs">
-        <div class="tab" onclick="switchTab(0)">OFFICE OF THE SCHOOLS DIVISION SUPERINTENDENT</div>
-        <div class="tab active" onclick="switchTab(1)">CURRICULUM IMPLEMENTATION DIVISION</div>
+        <div class="tab active" onclick="switchTab(0)">OFFICE OF THE SCHOOLS DIVISION SUPERINTENDENT</div>
+        <div class="tab" onclick="switchTab(1)">CURRICULUM IMPLEMENTATION DIVISION</div>
         <div class="tab" onclick="switchTab(2)">SCHOOL GOVERNANCE & OPERATIONS DIVISION</div>
     </div>
 
-    <table id="table-0" class="hidden">
-        <thead><tr><th>OFFICE / SECTION</th><th>HEAD OF OFFICE</th><th>CONTACT DETAILS</th></tr></thead>
-        <tbody>
-        <tr>
+    <div class="table-container">
+        <table id="table-0">
+            <thead><tr><th>OFFICE / SECTION</th><th>HEAD OF OFFICE</th><th>CONTACT DETAILS</th></tr></thead>
+            <tbody>
+            <tr>
                 <td><strong>Office of the Schools Division Superintendent</strong></td>
                 <td>Leonardo C. Canlas, EdD CESO VI<br><small>Assistant Schools Division Superintendent, OIC</small></td>
                 <td>Email: sanjosedelmonte.city@deped.gov.ph<br>Tel: (044) 305-7395 loc. 201, 203</td>
@@ -299,8 +299,9 @@
             </tbody>
     </table>
 
-    <table id="table-1">
-        <thead>
+        <table id="table-1" class="hidden">
+            <thead><tr><th>OFFICE / AREA</th><th>HEAD OF OFFICE</th><th>CONTACT INFO</th></tr></thead>
+            <tbody>
             <tr>
                 <th>OFFICE / AREA</th>
                 <th>HEAD OF OFFICE</th>
@@ -376,9 +377,10 @@
         </tbody>
     </table>
 
-    <table id="table-2" class="hidden">
-        <thead><tr><th>OFFICE</th><th>HEAD OF OFFICE</th><th>CONTACT NO.</th></tr></thead>
-        <tbody><tr><td colspan="3" style="text-align:center;"></td><tr>
+        <table id="table-2" class="hidden">
+            <thead><tr><th>OFFICE</th><th>HEAD OF OFFICE</th><th>CONTACT</th></tr></thead>
+            <tbody>
+            <tr>
                 <td><span class="office-tag">CID Office</span>Office of the Curriculum and Implementation Division</td>
                 <td><strong>Rolando T. Sotelo DEM</strong><br>Chief Education Supervisor</td>
                 <td>Email: rolando.sotelo001@deped.gov.ph<br>Tel: (044) 305-7395 loc. 206, 207</td>
@@ -446,41 +448,46 @@
         </tr>
     </tbody>
     </table>
+    </div>
 </div>
 
 <footer>
-    <p>Eco Park Muzon East, City of San Jose del Monte, Bulacan 3023, Philippines<br>
-    sanjosedelmonte.city@deped.gov.ph | (044) 305-7395<br>
-    <strong>DepEd Tayo City of San Jose del Monte</strong></p>
+    <div class="footer-left">
+        © 2026 Department of Education Certificate Verifier System
+    </div>
+    <div class="footer-right">
+        Developed by: Larry Cruz and Bea Patrice Cortez
+    </div>
 </footer>
 
 <script>
-     const burger = document.getElementById('burger');
+    // Navigation Logic
+    const burger = document.getElementById('burger');
     const navMenu = document.getElementById('nav-menu');
 
-    // Toggle menu and burger animation
     burger.addEventListener('click', () => {
         navMenu.classList.toggle('active');
         burger.classList.toggle('toggle');
     });
 
-    // Close menu when a link is clicked (useful for mobile)
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('active');
-            burger.classList.remove('toggle');
-        });
-    });
-
-
+    // Tab Switching Logic
     function switchTab(index) {
-        let tabs = document.querySelectorAll('.tab');
-        tabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
+        const tabs = document.querySelectorAll('.tab');
+        const tables = [
+            document.getElementById('table-0'),
+            document.getElementById('table-1'),
+            document.getElementById('table-2')
+        ];
 
-        for (let i = 0; i < 3; i++) {
-            const table = document.getElementById('table-' + i);
-            if (table) table.classList.toggle('hidden', i !== index);
-        }
+        tabs.forEach((tab, i) => {
+            tab.classList.toggle('active', i === index);
+        });
+
+        tables.forEach((table, i) => {
+            if (table) {
+                table.classList.toggle('hidden', i !== index);
+            }
+        });
     }
 </script>
 

@@ -5,146 +5,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>About | Certificate Verifier</title>
+    <title>About | CerVer - Certificate Verifier</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/cerverlogo2.svg">
 
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;  
-            font-family: "Segoe UI", Arial, sans-serif;;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: #ffffff;
-            color: #000;
-            
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #e4e4e6;
+            color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* NAVBAR */
+        /* ===== TOP NAV ===== */
         .top-nav {
-            background-color: #0b3c78;
+            background-color: #0b4a82;
             padding: 15px 40px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
             align-items: center;
-            color: white;
+            color: #ffffff;
             position: relative;
             z-index: 1000;
         }
 
-        /* Left Brand Side */
         .nav-brand {
-            text-align: left;
-            line-height: 1.2;
-            margin-left: 20px;
+            font-size: 20px;
             font-weight: bold;
-            font-size: 18px;
+            line-height: 1.2;
         }
 
-        .nav-brand small {
-            font-weight: normal;
-            font-size: 14px;
-            opacity: 0.9;
+        .nav-brand strong {
+            font-size: 22px;
+            font-weight: 300;
         }
 
         .nav-links {
             display: flex;
+            gap: 30px;
             align-items: center;
-            transition: 0.3s ease-in-out;
         }
 
-        .top-nav a {
-            color: #fff;
+        .nav-links a {
+            color: #ffffff;
             text-decoration: none;
-            margin: 0 20px;
-            font-size: 16px;
-            font-weight: 400;
-        }
-
-        .top-nav a:hover {
-            text-decoration: underline;
-        }
-
-        .login-btn {
-            background-color: #0056b3;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            display: block;
-            margin-bottom: 20px;
-        }
-        /* ===== MAIN CONTENT ===== */
-        .container {
-            width: 90%;
-            margin: 30px 150px 150px 150px;
-        }
-
-        h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        .breadcrumb {
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .breadcrumb a {
-            color: #000;
-            text-decoration: none;
-        }
-
-        .content-wrapper {
-            display: flex;
-            gap: 20px;
-        }
-
-        /* ===== LEFT CONTENT ===== */
-        .main-content {
-            flex: 3;
-        }
-
-        .main-content h2 {
-            color: #0b4a8b;
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-
-        .info-box {
-            display: flex;
-            gap: 20px;
-        }
-
-        .logos {
-            width: 180px;
-            text-align: center;
-        }
-
-        .logo {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 15px;
-        }
-
-        .logo img {
-            width: 160px;
-        }
-
-        .text-content {
-            text-align: justify;
             font-size: 15px;
-            line-height: 1.6;
+            transition: 0.3s;
         }
 
-        /* ===== BURGER ICON & ANIMATION ===== */
+        .nav-links a:hover { opacity: 0.8; text-decoration: underline; }
+
         .burger {
-            display: flex ;
+            display: none;
             flex-direction: column;
             cursor: pointer;
             gap: 5px;
@@ -153,219 +70,208 @@
 
         .burger span {
             height: 3px;
-            width: 28px;
+            width: 25px;
             background: white;
-            border-radius: 5px;
-            transition: all 0.3s ease;
+            border-radius: 3px;
+            transition: 0.4s;
         }
 
-        /* Animation to transform burger into 'X' */
-        .burger.toggle span:nth-child(1) {
-            transform: rotate(-45deg) translate(-5px, 6px);
-        }
-        .burger.toggle span:nth-child(2) {
-            opacity: 0;
-        }
-        .burger.toggle span:nth-child(3) {
-            transform: rotate(45deg) translate(-5px, -6px);
+        /* ===== MAIN CONTENT ===== */
+        .container {
+            max-width: 1120px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
         }
 
-        /* ===== RIGHT SIDEBAR ===== */
+        h1 {
+            font-size: 32px;
+            color: #0b4a82;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0b4a82;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 40px;
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid #0b4a82;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .main-content { flex: 2; }
+
+        .info-box {
+            display: flex;
+            gap: 40px;
+        }
+
+        .logos {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            min-width: 150px;
+            align-items: center; /* Centers logos in their column */
+        }
+
+        .logo-img {
+            width: 130px; /* Uniform width for all logos */
+            height: auto;
+            object-fit: contain;
+        }
+
+        .text-content {
+            text-align: justify;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        /* ===== SIDEBAR ===== */
         .sidebar {
-            flex: .7;
-            margin-right: 150px;
-            border: 1px solid #8aa6c1;
-            padding: 15px;
-            height: fit-content;
+            flex: 0.8;
+            padding-left: 30px;
+            border-left: 1px solid #ddd;
         }
 
         .sidebar h3 {
-            font-size: 16px;
-            margin-bottom: 10px;
+            font-size: 18px;
+            color: #0b4a82;
+            margin-bottom: 15px;
         }
 
         .sidebar a {
             display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #0b4a8b;
+            margin-bottom: 12px;
+            font-size: 15px;
+            color: #0b4a82;
             text-decoration: none;
+            font-weight: 500;
         }
+
+        .sidebar a:hover { text-decoration: underline; }
 
         /* ===== FOOTER ===== */
         footer { 
-            background-color: #e6e6e6; 
-            padding: 30px; 
-            text-align: center; 
-            font-size: 0.8rem; 
-            border-top: 1px solid #ccc; 
-            margin-top: 50px; }
-        
+            background-color: #fff; 
+            padding: 20px 40px; 
+            font-size: 13px; 
+            border-top: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: auto;
+        }
 
-        /* ===== MOBILE RESPONSIVE LOGIC ===== */
-        /*@media (max-width: 768px) {
-            .top-nav {
-                padding: 15px 20px;
-            }*/
+        /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .content-wrapper { flex-direction: column; padding: 25px; }
+            .sidebar { border-left: none; border-top: 1px solid #ddd; padding: 20px 0 0 0; }
+            .info-box { flex-direction: column; align-items: center; }
+            .logos { flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; }
+            .logo-img { width: 100px; } /* Slightly smaller logos on tablet/mobile */
+        }
 
-            @media (max-width: 480px) {
-                .nav-links {
-                    width: 70%; /* Takes up more space on small phones */
-                }
-            }
-
-            .burger {
-                display: flex;
-            }
-
+        @media (max-width: 768px) {
+            .top-nav { padding: 15px 20px; }
+            .burger { display: flex; }
             .nav-links {
                 position: fixed;
-                right: -100%; /* Hidden off-screen by default */
+                right: -100%;
                 top: 0;
                 height: 100vh;
-                width: 190px; /* Fixed width for desktop consistency */
-                background-color: #0b4a82; /* Matches the blue-grey in your screenshot */
-                display: flex;
+                width: 200px;
+                background: #0b4a82;
                 flex-direction: column;
-                justify-content: flex-start;
-                padding-top: 80px; 
-                gap: 0;
-                transition: 0.3s ease-in-out;
-                box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+                padding: 80px 20px;
+                transition: 0.4s ease-in-out;
+                z-index: 999;
             }
+            .nav-links.active { right: 0; }
+            .nav-links a { font-size: 18px; width: 100%; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            
+            .burger.toggle span:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
+            .burger.toggle span:nth-child(2) { opacity: 0; }
+            .burger.toggle span:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
 
-            .nav-links.active {
-                right: 0;
-            }
-
-            .nav-links a {
-                margin: 0;
-                padding: 20px 30px;
-                width: 100%;
-                text-align: left;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-                font-size: 18px;
-            }
+            footer { flex-direction: column; text-align: center; gap: 10px; }
+        }
     </style>
 </head>
 <body>
 
-<!-- ===== NAVBAR ===== -->
-<div class="top-nav">
-        <div class="nav-brand">
-            Department of Education<br>
-            <small>Learning Information System</small>
-        </div>
-
-        <div class="burger" id="burger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-       
-        <div class="nav-links" id="nav-menu">
-            <a href="index.php">Home</a>
-            <a href="about.php">About</a>
-            <a href="contact.php">Contact</a>
-            <a href="login.php">Login</a>
-            </div>    
+<nav class="top-nav">
+    <div class="nav-brand">
+        DEPARTMENT OF EDUCATION<br>
+        <strong>CerVer - Certificate Verifier</strong>
     </div>
- 
-<!-- ===== CONTENT ===== -->
-<div class="container">
 
+    <div class="burger" id="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="nav-links" id="nav-menu">
+        <a href="index.php">Home</a>
+        <a href="about.php">About</a>
+        <a href="contact.php">Contact</a>
+    </div>
+</nav>
+
+<div class="container">
     <h1>About</h1>  
 
     <div class="content-wrapper">
-        <!-- LEFT -->
         <div class="main-content">
-            <h2>About the DepEd Learners Information System</h2>
-
             <div class="info-box">
                 <div class="logos">
-                    <div class="logo">
-                        <!-- Replace with actual image -->
-                        <img src="C:\xampp\htdocs\Certificate-verifier\img\deped-csjdm-logo.png" alt="DepEd Seal">
-                    </div>
-                    <div class="logo">
-                        <!-- Replace with actual image -->
-                        <img src="http://localhost/log-in/LISproject/public/images/deped_matatag_logo.png" 
-                alt="DepEd Matatag Logo" 
-                class="welcome-logo">
-                    </div>
+                    <img src="img/cerverlogo2.svg" alt="CerVer Logo" class="logo-img">
+                    <img src="img/logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Seal" class="logo-img">
+                    <img src="http://localhost/log-in/LISproject/public/images/deped_matatag_logo.png" alt="DepEd Matatag Logo" class="logo-img">
                 </div>
 
                 <div class="text-content">
-                    <p>
-                        The DepEd Learners Information System (LIS) is an official, web-based
-                        platform developed by the Department of Education to systematically
-                        manage and maintain learner records in public schools. It serves as
-                        the primary repository of learner information, ensuring that data
-                        from enrollment to completion of basic education is accurate,
-                        consistent, and up to date.
-                    </p><br>
-
-                    <p>
-                        The system allows schools to register learners, update personal and
-                        academic information, and monitor enrollment status each school year.
-                        Through the LIS, school administrators and teachers can efficiently
-                        manage large volumes of data while reducing manual paperwork and errors.
-                    </p><br>
-
-                    <p>
-                        It also supports smooth coordination between schools, divisions, and
-                        regional offices. The DepEd LIS plays a vital role in educational
-                        planning and policy implementation. The data collected through the
-                        system is used for generating official reports, tracking learner
-                        progress, allocating resources, and supporting government programs
-                        and interventions.
-                    </p><br>
-
-                    <p>
-                        Security and data privacy are key priorities of the DepEd Learners
-                        Information System. Access to learner information is limited to
-                        authorized users, and safeguards are in place to protect sensitive
-                        data in compliance with existing data privacy policies.
-                    </p><br>
-
-                    <p>
-                        Overall, the DepEd Learners Information System aims to strengthen
-                        school management, improve data integrity, and support the Department
-                        of Education’s mission of delivering accessible, efficient, and
-                        quality basic education to every learner.
-                    </p>
+                    <p>The DepEd Learners Information System (LIS) is an official, web-based platform developed by the Department of Education to systematically manage and maintain learner records in public schools.</p>
+                    <br>
+                    <p>The system allows schools to register learners, update personal and academic information, and monitor enrollment status each school year. Through the LIS, school administrators and teachers can efficiently manage large volumes of data while reducing manual paperwork and errors.</p>
+                    <br>
+                    <p>Security and data privacy are key priorities. Access to learner information is limited to authorized users, and safeguards are in place to protect sensitive data in compliance with existing data privacy policies.</p>
                 </div>
             </div>
         </div>
 
-        <!-- RIGHT -->
         <div class="sidebar">
-            <h3>DepEd Tayo Bulacan</h3>
-            <a href="#">DepEd website</a>
-            <a href="#">Follow page</a>
-            <a href="#">Follow X</a>
+            <h3>Quick Links</h3>
+            <a href="https://depedcsjdm.weebly.com/" target="_blank">DepEd Website</a>
+            <a href="https://www.facebook.com/DepEdTayoSanJosedelMonte" target="_blank">Follow Facebook</a>
         </div>
     </div>
 </div>
 
-<!-- ===== FOOTER ===== -->
 <footer>
-    <p>Eco Park Muzon East, City of San Jose del Monte, Bulacan 3023, Philippines<br>
-    sanjosedelmonte.city@deped.gov.ph | (044) 305-7395<br>
-    <strong>DepEd Tayo City of San Jose del Monte</strong></p>
+    <div class="footer-left">
+        © 2026 Department of Education Certificate Verifier System
+    </div>
+    <div class="footer-right">
+        Developed by: Larry Cruz and Bea Patrice Cortez
+    </div>
 </footer>
 
 <script>
     const burger = document.getElementById('burger');
     const navMenu = document.getElementById('nav-menu');
 
-    // Toggle menu and burger animation
     burger.addEventListener('click', () => {
         navMenu.classList.toggle('active');
         burger.classList.toggle('toggle');
     });
 
-    // Close menu when a link is clicked (useful for mobile)
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
             navMenu.classList.remove('active');

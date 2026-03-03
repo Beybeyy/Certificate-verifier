@@ -45,8 +45,10 @@ $certificates = $stmt2->get_result();
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Teacher Dashboard</title>
+<title>Teacher Dashboard | CerVer - Certificate Verifier</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="img/cerverlogo2.svg">
+
 <style>
 /* General */
 * { 
@@ -102,7 +104,11 @@ a.view-pdf:hover { text-decoration: underline; }
 .edit-btn:hover { background:#f57c00; }
 
 /* Pagination Footer */
-.pagination-footer { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background-color:#f8fbff; border:1px solid #e0e0e0; border-top:none; font-size:13px; flex-wrap:wrap; gap:10px; }
+.pagination-footer { 
+    display:flex; 
+    justify-content:space-between; 
+    align-items:center; 
+    padding:10px 20px; background-color:#f8fbff; border:1px solid #e0e0e0; border-top:none; font-size:13px; flex-wrap:wrap; gap:10px; }
 .footer-right { display:flex; align-items:center; gap:20px; }
 .row-select-wrapper { color:#5c7c99; font-size:13px; }
 .row-select-wrapper select { padding:2px 5px; border:1px solid #1976d2; border-radius:4px; color:#0b4a82; background:transparent; font-size:13px; margin-left:5px; }
