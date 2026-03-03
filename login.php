@@ -195,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .forgot-password a:hover {
         color: #0b4a82; /* Changes to your brand blue */
-        
+       
         opacity: 0.8;
         }
 
@@ -233,8 +233,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .back-link:hover span {
-            transform: translateX(5px); /* Makes the arrow nudge to the left */
+            transform: translateX(1px); /* Makes the arrow nudge to the left */
         }
+
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }

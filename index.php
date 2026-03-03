@@ -87,8 +87,10 @@ if (isset($_GET['control_number'])) {
         /* Search Layout */
         .search-row { display: flex; flex-direction: column; gap: 12px; }
         .search-row input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
-        .button-group { display: flex; gap: 10px; }
-        .button-group button, .reset-btn {
+        .button-group { display: flex; gap: 10px; margin-bottom: 20px;}
+        .button-group button, 
+        
+        .reset-btn {
             flex: 1; padding: 12px; border: none; border-radius: 8px;
             cursor: pointer; font-weight: 600; text-decoration: none; color: white;
         }
@@ -98,6 +100,27 @@ if (isset($_GET['control_number'])) {
         /* Results */
         .result { margin-top: 20px; padding: 15px; background: #f1f8ff; border-radius: 8px; text-align: left; }
         .error { color: #d32f2f; margin-top: 15px; font-weight: bold; }
+        
+        .login-account-link {
+            margin-top: 20px;
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block; /* Helps with padding and transforms if needed */
+        }
+
+        .login-account-link:hover {
+            color: #0b4a82; /* Darkens slightly to match your brand blue */
+           
+            transform: translateY(-1px); /* Subtle "lift" effect */
+        }
+
+        .custom-hr {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 25px 0;
+        }
         
         footer {
             background: #fff; padding: 20px 40px; border-top: 1px solid #ccc;
@@ -184,8 +207,8 @@ if (isset($_GET['control_number'])) {
             </div>
         <?php endif; ?>
 
-        <hr style="border:0; border-top:1px solid #eee; margin:25px 0;">
-        <a href="login.php" style="color:#1976d2; text-decoration:none; font-weight:600;">Login account</a>
+        <hr class="btn-loginlink">
+    <a href="login.php" class="login-account-link">Login account</a>
     </div>
 </div>
 

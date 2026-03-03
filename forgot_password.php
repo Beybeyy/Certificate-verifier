@@ -304,7 +304,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <a href="login.php" class="back-link">
-            <span>&larr;</span> back to login
+            <span>&larr;</span> Back to login
         </a>
     </div>
 </main>
