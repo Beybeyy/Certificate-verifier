@@ -279,12 +279,8 @@ require_once __DIR__ . "/config/db.php";
 </main>
 
 <footer>
-    <div class="footer-left">
-        © 2026 Department of Education Certificate Verifier System
-    </div>
-    <div class="footer-right">
-        Developed by: Larry Cruz and Bea Patrice Cortez
-    </div>
+    <div>© 2026 Department of Education Certificate Verifier System</div>
+    <div>Front-End Development: Larry Cruz | Back-End Development: Bea Patrice Cortez  </div>
 </footer>
 
 <script>
