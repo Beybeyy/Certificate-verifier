@@ -134,8 +134,8 @@
 
         /* ===== SIDEBAR ===== */
         .sidebar {
-            flex: 0.8;
-            padding-left: 30px;
+            flex: 0.4;
+            padding-left: 50px;
             border-left: 1px solid #ddd;
         }
 
@@ -237,11 +237,15 @@
                 </div>
 
                 <div class="text-content">
-                    <p>The DepEd Learners Information System (LIS) is an official, web-based platform developed by the Department of Education to systematically manage and maintain learner records in public schools.</p>
+                    <h4>About the Certificate Verification System (CerVer)</h4>
+                    <p>The Certificate Verification System is a dedicated digital platform designed to ensure the authenticity and integrity of professional certifications issued by the Department of Education Division Office.</p>
+                    <p>As a centralized hub for monitoring and validation, this system bridges the gap between manual record-keeping and modern, secure digital verification. Our goal is to provide school administrators, teachers, and stakeholders with a reliable tool to confirm the legitimacy of educational and professional credentials at a glance.</p>
                     <br>
-                    <p>The system allows schools to register learners, update personal and academic information, and monitor enrollment status each school year. Through the LIS, school administrators and teachers can efficiently manage large volumes of data while reducing manual paperwork and errors.</p>
-                    <br>
-                    <p>Security and data privacy are key priorities. Access to learner information is limited to authorized users, and safeguards are in place to protect sensitive data in compliance with existing data privacy policies.</p>
+                    <h4> How it Works</h4>
+                    <p><b>Centralized Uploads:</b> Authorized Division Office personnel upload official certificates into the system.</p>
+                    <p><b>Unique Identification:</b> Each document is logged with specific metadata (such as Control Numbers or QR codes) for easy retrieval.</p>
+                    <p><b>Instant Verification:</b> Users can input the required control number on the verification portal to receive an immediate confirmation of the document’s status and authenticity.</p>
+
                 </div>
             </div>
         </div>

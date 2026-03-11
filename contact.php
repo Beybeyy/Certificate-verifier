@@ -163,7 +163,11 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
-            margin-top: 40px;
+            margin-top: auto;
+            left: 0;
+            position:absolute;
+            bottom: 0;
+
         }
 
         /* ===== MOBILE RESPONSIVE ===== */
@@ -236,7 +240,7 @@
         </div>
     </div>
 
-    <div class="tabs">
+    <!-- <div class="tabs">
         <div class="tab active" onclick="switchTab(0)">OFFICE OF THE SCHOOLS DIVISION SUPERINTENDENT</div>
         <div class="tab" onclick="switchTab(1)">CURRICULUM IMPLEMENTATION DIVISION</div>
         <div class="tab" onclick="switchTab(2)">SCHOOL GOVERNANCE & OPERATIONS DIVISION</div>
@@ -442,7 +446,7 @@
     </tbody>
     </table>
     </div>
-</div>
+</div> -->
 
 <footer>
     <div>© 2026 Department of Education Certificate Verifier System</div>

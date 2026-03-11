@@ -125,20 +125,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .nav-links a:hover { opacity: 0.8; text-decoration: underline; }
 
-        /* ===== LOGO SECTION ===== */
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .logo-container img {
-            height: 100px;
-            width: auto;
-            object-fit: contain;
-        }
+        /* ===== LOGOS & PAGE CONTENT ===== */
+        .logo-container { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 10px; }
+        .logo-container img { height: 200px; width: auto; object-fit: contain; } 
 
         /* ===== CARD ===== */
         .card-wrapper {
@@ -286,8 +275,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </nav>
 
 <div class="logo-container">
-    <img src="img/logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Logo">
-    <img src="img/deped-csjdm-logo.png" alt="Division Logo">
+<img src="img/sdologo.svg" alt="Logo">
 </div>
 
 <main class="card-wrapper">

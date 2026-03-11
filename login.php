@@ -137,21 +137,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transition: 0.4s;
         }
 
-        /* ===== LOGO SECTION (Identical to Index) ===== */
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .logo-container img {
-            height: 100px;
-            width: auto;
-            object-fit: contain;
-        }
-
+        /* ===== LOGOS & PAGE CONTENT ===== */
+        .logo-container { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 10px; }
+        .logo-container img { height: 200px; width: auto; object-fit: contain; }
         /* ===== LOGIN CARD ===== */
         .login-wrapper {
             flex: 1;
@@ -303,11 +291,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </nav>
 
 <div class="logo-container">
-    <img src="img/logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Logo">
-    <img src="img/deped-csjdm-logo.png" alt="Division Logo">
+<img src="img/sdologo.svg" alt="Logo">
+    
 </div>
 
-<main class="login-wrapper">
+<main class="login-wrapper">    
     <div class="login-card">
         <h2>Login</h2>
         
@@ -358,7 +346,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
             navMenu.classList.remove('active');
-            burger.classList.remove('toggle');
+            burger.classList.remove('toggle'); 
         });
     });
 </script>

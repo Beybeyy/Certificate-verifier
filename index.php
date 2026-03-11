@@ -72,8 +72,8 @@ if (isset($_GET['control_number'])) {
         .burger span { height: 3px; width: 25px; background: white; border-radius: 3px; transition: 0.4s; }
 
         /* ===== LOGOS & PAGE CONTENT ===== */
-        .logo-container { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px; }
-        .logo-container img { height: 100px; width: auto; object-fit: contain; }
+        .logo-container { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 10px; }
+        .logo-container img { height: 200px; width: auto; object-fit: contain; }
 
         .page-wrapper { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
         .card {
@@ -175,8 +175,8 @@ if (isset($_GET['control_number'])) {
 </nav>
 
 <div class="logo-container">
-    <img src="img/logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Logo">
-    <img src="img/deped-csjdm-logo.png" alt="Division Logo">
+    <img src="img/sdologo.svg" alt="Logo">
+    
 </div>
 
 <div class="page-wrapper">
@@ -213,10 +213,7 @@ if (isset($_GET['control_number'])) {
     </div>
 </div>
 
-<footer>
-    <div>© 2026 Department of Education Certificate Verifier System</div>
-    <div>Front-End Development: Larry Cruz | Back-End Development: Bea Patrice Cortez  </div>
-</footer>
+ 
 
 <script>
     const burger = document.getElementById('burger');
