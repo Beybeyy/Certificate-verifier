@@ -364,6 +364,13 @@ a:hover { text-decoration:underline; }
   color: black;        /* normal color */
   text-decoration: none;
   transition: color 0.2s ease; /* smooth change */
+  background: #e21717; /* Dark green */
+    color: white; 
+    padding: 8px 25px; 
+    border-radius: 8px; 
+    font-weight: bold; 
+    border: none;
+    cursor: pointer;
 }
 
 .logout:hover {
@@ -581,10 +588,10 @@ th select option {
     </div>
 
     <div class="nav-links" id="nav-menu">
-        <a href="../index.php">Home</a>
-        <a href="../about.php">About</a>
-        <a href="#">Contact</a>
-        <a href="../login.php" class="logout">Logout  </a>
+        <!-- <a href="dashboard.php">Home</a> -->
+        <!-- <a href="../about.php">About</a> -->
+        <!-- <a href="#">Contact</a> -->
+        <a href="../login.php"> <button class="logout">Log out</button> </a>
     </div>
 </nav>  
 
