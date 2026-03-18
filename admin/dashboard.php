@@ -77,7 +77,7 @@
                     if ($check->get_result()->num_rows > 0) {
                         $skipped++;
                         continue;
-                    }
+                    }   
 
                     // // Check if teacher exists
                     // $stmt = $conn->prepare("SELECT id FROM users WHERE LOWER(email)=LOWER(?)");
@@ -575,6 +575,48 @@
         background: #fff;
     }
     
+    /* Fixed sizes for each table column */
+th.no-col, td.no-col {
+    width: 58px;
+    height: 92px;
+}
+
+th.control-col, td.control-col {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+    width: 137px;
+    height: 92px;
+}
+
+th.name-col, td.name-col {
+    width: 276.89px;
+    height: 92px;
+}
+
+th.seminar-col, td.seminar-col {
+    width: 570.79px;
+    height: 92px;
+}
+
+th.action-col, td.action-col {
+    width: 79.99px;
+    height: 92px;
+}
+
+/* Optional: keep text tidy */
+th, td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Table fixed layout */
+table {
+    table-layout: fixed;  /* ensures fixed column widths */
+    border-collapse: collapse;          /* table width adjusts to column widths */
+}
     </style>
     </head>
     <body> 
@@ -604,6 +646,7 @@
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <a href="../files/template.xlsx" download class="dbutton">Download Template</a>
                     <button id="uploadBtn" class="upload-btn">Upload</button>
+                     <span id="loadingText" style="display:none; margin-left:10px; font-weight:bold;">uploading...</span>
                     
                     <div class="search-container">
                         <input type="text" id="certificateSearch" placeholder="Search" onkeyup="filterTable()">
@@ -824,6 +867,15 @@
             console.log("Navigating to page: " + page);
             // Add your logic to filter/load data for the specific page here
         });
+    });
+    const form = document.getElementById('csvForm');
+    const loadingText = document.getElementById('loadingText');
+    const submitBtn = document.getElementById('uploadBtn');
+
+    form.addEventListener('submit', function() {
+        // Show loading text and disable button
+        loadingText.style.display = 'inline';
+        submitBtn.disabled = true;
     });
 
     function prevPage() {
