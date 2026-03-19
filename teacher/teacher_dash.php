@@ -37,7 +37,7 @@ $stmt2 = $conn->prepare("
     LIMIT ? OFFSET ?
 ");
 $stmt2->bind_param("isii", $teacher_id, $teacher['email'], $rowsPerPage, $offset);
-$stmt2->execute();
+$stmt2->execute(); 
 $certificates = $stmt2->get_result();
 ?>
 
@@ -104,15 +104,11 @@ a.view-pdf:hover { text-decoration: underline; }
 .edit-btn:hover { background:#f57c00; }
 
 /* Pagination Footer */
-<<<<<<< HEAD
 .pagination-footer { 
     display:flex; 
-    justify-content:space-between; 
+    justify-content:space-between;  
     align-items:center; 
     padding:10px 20px; background-color:#f8fbff; border:1px solid #e0e0e0; border-top:none; font-size:13px; flex-wrap:wrap; gap:10px; }
-=======
-.pagination-footer { display:flex; justify-content:space-between; align-items:center; padding:10px 1%0px; background-color:#f8fbff; border:1px solid #e0e0e0; border-top:none; font-size:13px; flex-wrap:wrap; gap:10px; }
->>>>>>> 7eddaa3283a3f1087ffa2fe6aa21e6409f805e24
 .footer-right { display:flex; align-items:center; gap:20px; }
 .row-select-wrapper { color:#5c7c99; font-size:13px; }
 .row-select-wrapper select { padding:2px 5px; border:1px solid #1976d2; border-radius:4px; color:#0b4a82; background:transparent; font-size:13px; margin-left:5px; }
@@ -127,6 +123,9 @@ a.view-pdf:hover { text-decoration: underline; }
     .table-wrapper { overflow-x:auto; }
     .cert-table thead th, .cert-table tbody td { padding:10px 12px; }
 }
+.seminar-cell.expanded {
+    white-space: normal;
+    overflow: visible;
 </style>
 </head>
 <body>
@@ -177,7 +176,9 @@ a.view-pdf:hover { text-decoration: underline; }
                 <?php while ($row = $certificates->fetch_assoc()): ?>
                 <tr>
                     <td><?= htmlspecialchars($row['control_number']) ?></td>
-                    <td><?= htmlspecialchars($row['seminar_title']) ?></td>
+                    <td class="seminar-cell" onclick="toggleSeminar(this)" title="<?= htmlspecialchars($row['seminar_title']) ?>">
+                        <?= htmlspecialchars($row['seminar_title']) ?>
+                    </td>
                     <td>
                         <a class="view-pdf" href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">View Certificate</a>
                     </td>

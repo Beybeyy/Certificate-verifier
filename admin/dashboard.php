@@ -617,6 +617,18 @@ table {
     table-layout: fixed;  /* ensures fixed column widths */
     border-collapse: collapse;          /* table width adjusts to column widths */
 }
+.seminar-cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* Expanded (show full text) */
+.seminar-cell.expanded {
+    white-space: normal;
+    overflow: visible;
+}
     </style>
     </head>
     <body> 
@@ -730,7 +742,9 @@ table {
                         style="display:none; width:120px;">
 
                 </td>
-                <td><?= htmlspecialchars($row['seminar_title']) ?></td>
+                <td class="seminar-cell" onclick="toggleSeminar(this)">
+                    <?= htmlspecialchars($row['seminar_title']) ?>
+                </td>
                 <!-- <td><?= htmlspecialchars($row['display_email'] ?? '') ?></td> -->
                 <!-- <td><a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank">Link</a></td> -->
                 <td><button class="edit-btn" onclick="editName(this, <?= $row['cert_id'] ?>)">
@@ -885,6 +899,11 @@ table {
     function nextPage() {
         console.log("Next Page Clicked");
     }
+  function toggleSeminar(cell) {
+    cell.classList.toggle('expanded');
+}
+
+    
     </script>
 
     </body>
