@@ -199,10 +199,6 @@ if (isset($_GET['control_number'])) {
 
         <?php if ($result && $row = $result->fetch_assoc()): ?>
             <div class="result">       
-                <p><strong>Status:</strong> ✅ Verified</p>
-                <p><strong>Control #:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
-                <p><strong>Name:</strong> <?= htmlspecialchars($row['display_name']) ?></p>
-                <p><strong>Seminar:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
                 <p><strong>Control No:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
                 <p><strong>Name:</strong> <?= htmlspecialchars($row['display_name']) ?></p>
                 <p><strong>Activity:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
