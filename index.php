@@ -203,6 +203,10 @@ if (isset($_GET['control_number'])) {
                 <p><strong>Control #:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
                 <p><strong>Name:</strong> <?= htmlspecialchars($row['display_name']) ?></p>
                 <p><strong>Seminar:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
+                <p><strong>Control No:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
+                <p><strong>Name:</strong> <?= htmlspecialchars($row['display_name']) ?></p>
+                <p><strong>Activity:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
+                <h3><strong>Status: ✅ Verified</strong></h3>
                 
                 <!-- <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank" style="color:#1976d2;">View Certificate</a> -->
             </div>
