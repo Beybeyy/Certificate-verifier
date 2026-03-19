@@ -20,7 +20,7 @@ if (isset($_GET['control_number'])) {
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows === 0) {
-            $error = "❌ Certificate not found or invalid control number.";
+            $error = "❌ Invalid control number.";
         }
     } else {
         $error = "⚠️ Please enter a control number.";

@@ -223,7 +223,7 @@
     /* Main */
     .main-container { margin:20px; }
     .upload-btn { 
-        background: #1b5e20; /* Dark green */
+        background: #28a745; /* Dark green */
         color: white; 
         padding: 8px 25px; 
         border-radius: 8px; 
@@ -231,7 +231,7 @@
         border: none;
         cursor: pointer;
     }
-    .upload-btn:hover { background:#e68a00; text-decoration:none; }
+    .upload-btn:hover { background:#1b5e20; text-decoration:none; }
 
     .dlbtn { 
         background: #1b5e20; /* Dark green */
