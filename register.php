@@ -280,7 +280,7 @@ require_once __DIR__ . "/config/db.php";
 
 <footer>
     <div>© 2026 Department of Education Certificate Verifier System</div>
-    <div>Front-End Development: Larry Cruz | Back-End Development: Bea Patrice Cortez  </div>
+    <div>Front-End Development: Larry Cruz | Back-End Development: Bea Patrice Cortez</div>
 </footer>
 
 <script>

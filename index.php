@@ -20,7 +20,7 @@ if (isset($_GET['control_number'])) {
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows === 0) {
-            $error = "❌ Invalid control number.";
+            $error = "❌ Certificate not found or invalid control number.";
         }
     } else {
         $error = "⚠️ Please enter a control number.";
@@ -180,13 +180,13 @@ if (isset($_GET['control_number'])) {
 </div>
 
 <div class="page-wrapper">
-    <div class="card">  
+    <div class="card">
         <h2>Certificate Verification</h2>
         <p class="subtitle">Enter the control number to verify the certificate.</p>
 
         <form method="GET">
             <div class="search-row">
-                <input type="text" name="control_number" placeholder="Enter Control Number" 
+                <input type="text" name="control_number" placeholder="Enter Control Number"
                        value="<?= isset($_GET['control_number']) ? htmlspecialchars($_GET['control_number']) : '' ?>" required autocomplete="off">
                 <div class="button-group">
                     <button type="submit" class="btn-search">Search</button>
@@ -199,10 +199,10 @@ if (isset($_GET['control_number'])) {
 
         <?php if ($result && $row = $result->fetch_assoc()): ?>
             <div class="result">       
-                <p><strong>Control No:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
-                <p><strong>Name:</strong> <?= htmlspecialchars($row['display_name']) ?></p>
-                <p><strong>Activity:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
                 <p><strong>Status:</strong> ✅ Verified</p>
+                <p><strong>Control #:</strong> <?= htmlspecialchars($row['control_number']) ?></p>
+                <p><strong>Name:</strong> <?= htmlspecialchars($row['display_name']) ?></p>
+                <p><strong>Seminar:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
                 
                 <!-- <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank" style="color:#1976d2;">View Certificate</a> -->
             </div>
@@ -213,6 +213,10 @@ if (isset($_GET['control_number'])) {
     </div>
 </div>
 
+<footer>
+    <div>© 2026 Department of Education Certificate Verifier System</div>
+    <div>Front-End Developer: Larry Cruz | Back-End Developer: Bea Patrice Cortez</div>
+</footer>
  
 
 <script>
