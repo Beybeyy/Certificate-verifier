@@ -1,178 +1,146 @@
     <?php
-    session_start();
-    require_once __DIR__ . "/../config/db.php";
+session_start();
+require_once __DIR__ . "/../config/db.php";
 
-    /* ===== INLINE NAME UPDATE ===== */
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_name'])) {
-        $cert_id = (int)$_POST['id'];
-        $new_name = trim($_POST['name']);
+/* ===== INLINE NAME UPDATE ===== */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_name'])) {
+    $cert_id = (int)$_POST['id'];
+    $new_name = trim($_POST['name']);
 
-        if ($new_name !== '') {
-            // Check if certificate has a registered user
-            $stmt = $conn->prepare("SELECT teacher_id FROM certificates WHERE id=?");
-            $stmt->bind_param("i", $cert_id);
+    if ($new_name !== '') {
+        // Check if certificate has a registered user
+        $stmt = $conn->prepare("SELECT teacher_id FROM certificates WHERE id=?");
+        $stmt->bind_param("i", $cert_id);
+        $stmt->execute();
+        $res = $stmt->get_result()->fetch_assoc();
+
+        if ($res['teacher_id']) {
+            // Registered user → update users.name
+            $stmt = $conn->prepare("UPDATE users SET name=? WHERE id=?");
+            $stmt->bind_param("si", $new_name, $res['teacher_id']);
             $stmt->execute();
-            $res = $stmt->get_result()->fetch_assoc();
-
-            if ($res['teacher_id']) {
-                // Registered user → update users.name
-                $stmt = $conn->prepare("UPDATE users SET name=? WHERE id=?");
-                $stmt->bind_param("si", $new_name, $res['teacher_id']);
-                $stmt->execute();
-            } else {
-                // Not registered → update certificates.temp_name
-                $stmt = $conn->prepare("UPDATE certificates SET temp_name=? WHERE id=?");
-                $stmt->bind_param("si", $new_name, $cert_id);
-                $stmt->execute();
-            }
+        } else {
+            // Not registered → update certificates.temp_name
+            $stmt = $conn->prepare("UPDATE certificates SET temp_name=? WHERE id=?");
+            $stmt->bind_param("si", $new_name, $cert_id);
+            $stmt->execute();
         }
-        exit;
     }
+    exit;
+}
 
-    /* ===== ADMIN CHECK ===== */
-    if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
-        header("Location: ../login.php");
-        exit();
-    }
+/* ===== ADMIN CHECK ===== */
+if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
 
-    /* ===== PAGINATION SETUP ===== */
-    $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-    $rowsPerPage = isset($_GET['rows']) ? (int)$_GET['rows'] : 100;
-    $offset = ($page - 1) * $rowsPerPage;
+/* ===== PAGINATION SETUP ===== */
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$rowsPerPage = isset($_GET['rows']) ? (int)$_GET['rows'] : 100;
+$offset = ($page - 1) * $rowsPerPage;
 
-    /* ===== HANDLE CSV UPLOAD ===== */
-    $messages = [];
+/* ===== HANDLE CSV UPLOAD ===== */
+$messages = [];
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 
-        if ($_FILES['csv_file']['error'] !== 0) {
-            $messages[] = "❌ Please upload a valid CSV file.";
+    if ($_FILES['csv_file']['error'] !== 0) {
+        $messages[] = "❌ Please upload a valid CSV file.";
+    } else {
+
+        $file = fopen($_FILES['csv_file']['tmp_name'], "r");
+        if (!$file) {
+            $messages[] = "❌ Failed to open CSV file.";
         } else {
 
-            $file = fopen($_FILES['csv_file']['tmp_name'], "r");
-            if (!$file) {
-                $messages[] = "❌ Failed to open CSV file.";
-            } else {
+            fgetcsv($file); // skip header
+            $inserted = 0;
+            $skipped  = 0;
 
-                fgetcsv($file); // skip header
-                $inserted = 0;
-                $skipped  = 0;
+            while (($row = fgetcsv($file)) !== false) {
+                if (count(array_filter($row)) === 0) continue;
 
-                while (($row = fgetcsv($file)) !== false) {
+                // CSV column order: control_number | name | seminar_title | teacher_email | certificate_file
+                [$control, $name, $title] = array_map('trim', $row);
 
-                    if (count(array_filter($row)) === 0) continue;
-
-                    // CSV column order: control_number | name | seminar_title | teacher_email | certificate_file
-                    [$control, $name, $title] = array_map('trim', $row);
-
-                    if (!$control || !$name || !$title) {
-                        $skipped++;
-                        continue;
-                    }
-
-                    // Check duplicate control number
-                    $check = $conn->prepare("SELECT id FROM certificates WHERE control_number=?");
-                    $check->bind_param("s", $control);
-                    $check->execute();
-                    if ($check->get_result()->num_rows > 0) {
-                        $skipped++;
-                        continue;
-                    }   
-
-                    // // Check if teacher exists
-                    // $stmt = $conn->prepare("SELECT id FROM users WHERE LOWER(email)=LOWER(?)");
-                    // $stmt->bind_param("s", $teacher_email);
-                    // $stmt->execute();
-                    // $res = $stmt->get_result();
-
-                    // if ($res->num_rows > 0) {
-                    //     $teacher_id = $res->fetch_assoc()['id'];
-                    //     $teacher_email_pending = null;
-
-                    //     // Optionally update user name if empty
-                    //     $updateUser = $conn->prepare("UPDATE users SET name=? WHERE id=? AND (name IS NULL OR name='')");
-                    //     $updateUser->bind_param("si", $name, $teacher_id);
-                    //     $updateUser->execute();
-                    // } else {
-                    //     $teacher_id = null;
-                    //     $teacher_email_pending = $teacher_email;
-                    // }
-
-                    // Insert certificate
-                    $insert = $conn->prepare("
-                        INSERT INTO certificates 
-                        (control_number, temp_name, seminar_title)
-                        VALUES (?, ?, ?)
-                    ");
-
-                    $insert->bind_param("sss", $control, $name, $title);
-
-                    if ($insert->execute()) {
-                        $inserted++;
-                    } else {
-                        $skipped++;
-                    }
+                if (!$control || !$name || !$title) {
+                    $skipped++;
+                    continue;
                 }
 
-                fclose($file);
-                $messages[] = "✅ Inserted: $inserted | ❌ Skipped: $skipped";
+                // Check duplicate control number
+                $check = $conn->prepare("SELECT id FROM certificates WHERE control_number=?");
+                $check->bind_param("s", $control);
+                $check->execute();
+                if ($check->get_result()->num_rows > 0) {
+                    $skipped++;
+                    continue;
+                }
+
+                // Insert certificate with NULL for certificate_file
+                $insert = $conn->prepare("
+                    INSERT INTO certificates 
+                    (control_number, temp_name, seminar_title, certificate_file)
+                    VALUES (?, ?, ?, NULL)
+                ");
+                $insert->bind_param("sss", $control, $name, $title);
+
+                if ($insert->execute()) {
+                    $inserted++;
+                } else {
+                    $skipped++;
+                }
             }
+
+            fclose($file);
+            $messages[] = "✅ Inserted: $inserted | ❌ Skipped: $skipped";
         }
     }
-    /* ===== SORTING ===== */
-    $sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
+}
 
-    // ALWAYS define default first (in case no case matches)
-    $orderBy = "ORDER BY c.created_at DESC"; // newest first
+/* ===== SORTING ===== */
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
+$orderBy = "ORDER BY c.created_at DESC"; // default
 
-    switch ($sort) {
+switch ($sort) {
+    case 'control_new':
+        $orderBy = "ORDER BY c.control_number DESC";
+        break;
+    case 'control_old':
+        $orderBy = "ORDER BY c.control_number ASC";
+        break;
+    case 'name_asc':
+        $orderBy = "ORDER BY COALESCE(u.name, c.temp_name) COLLATE utf8mb4_general_ci ASC";
+        break;
+    case 'name_desc':
+        $orderBy = "ORDER BY COALESCE(u.name, c.temp_name) COLLATE utf8mb4_general_ci DESC";
+        break;
+}
 
-        // CONTROL NUMBER
-        case 'control_new': // newest first
-            $orderBy = "ORDER BY c.control_number DESC";
-            break;
+/* ===== FETCH CERTIFICATES ===== */
+$sql = "
+    SELECT 
+        c.id AS cert_id,
+        c.control_number,
+        c.seminar_title,
+        c.certificate_file,
+        c.created_at,
+        u.id AS user_id,
+        u.name AS user_name,
+        c.temp_name AS temp_name,
+        COALESCE(u.email, c.teacher_email_pending) AS display_email
+    FROM certificates c
+    LEFT JOIN users u 
+        ON c.teacher_id = u.id
+    $orderBy
+    LIMIT $rowsPerPage OFFSET $offset
+";
 
-        case 'control_old': // oldest first
-            $orderBy = "ORDER BY c.control_number ASC";
-            break;
-
-        // NAME
-        case 'name_asc': // A-Z
-            $orderBy = "ORDER BY COALESCE(u.name, c.temp_name) COLLATE utf8mb4_general_ci ASC";
-            break;
-
-        case 'name_desc': // Z-A
-            $orderBy = "ORDER BY COALESCE(u.name, c.temp_name) COLLATE utf8mb4_general_ci DESC";
-            break;
-
-        default: // fallback
-            $orderBy = "ORDER BY c.created_at DESC";
-            break;
-    }   
-    /* ===== FETCH CERTIFICATES ===== */
-    $sql = "
-        SELECT 
-            c.id AS cert_id,
-            c.control_number,
-            c.seminar_title,
-            c.certificate_file,
-            c.created_at,
-            u.id AS user_id,
-            u.name AS user_name,
-            c.temp_name AS temp_name,
-            COALESCE(u.email, c.teacher_email_pending) AS display_email
-        FROM certificates c
-        LEFT JOIN users u 
-            ON c.teacher_id = u.id
-        $orderBy
-        LIMIT $rowsPerPage OFFSET $offset
-    ";
-
-    $totalResult = $conn->query("SELECT COUNT(*) AS total FROM certificates");
-    $totalRows = $totalResult->fetch_assoc()['total'];   
-    $result = $conn->query($sql);
-    ?>
-
+$totalResult = $conn->query("SELECT COUNT(*) AS total FROM certificates");
+$totalRows = $totalResult->fetch_assoc()['total'];
+$result = $conn->query($sql);
+?>
 
     <!DOCTYPE html>
     <html lang="en">
@@ -899,7 +867,7 @@ table {
     function nextPage() {
         console.log("Next Page Clicked");
     }
-  function toggleSeminar(cell) {
+  function toggleSeminar(cell) {    
     cell.classList.toggle('expanded');
 }
 
