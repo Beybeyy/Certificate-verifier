@@ -37,8 +37,8 @@ if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
 
 /* ===== PAGINATION SETUP ===== */
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$rowsPerPage = isset($_GET['rows']) ? (int)$_GET['rows'] : 100;
-$offset = ($page - 1) * $rowsPerPage;
+$rowsPerPage = isset($_GET['rows']) ? (int)$_GET['rows'] : 10;
+$offset = ($page - 1) * $rowsPerPage;                                                                                                              
 
 /* ===== HANDLE CSV UPLOAD ===== */
 $messages = [];
@@ -543,9 +543,9 @@ $result = $conn->query($sql);
         background: #fff;
     }
     
-    /* Fixed sizes for each table column */
+/* Fixed sizes for each table column */
 th.no-col, td.no-col {
-    width: 58px;
+    width: 43px; /* was 58px */
     height: 92px;
 }
 
@@ -565,7 +565,7 @@ th.seminar-col, td.seminar-col {
 }
 
 th.action-col, td.action-col {
-    width: 79.99px;
+    width: 64.99px; /* was 79.99px */
     height: 92px;
 }
 
@@ -660,7 +660,7 @@ table {
         <table>
             <?php $rowNumber = 1; ?>
             <tr>
-                <th>No.</th>
+                <th class="no-col">No.</th>
             <th>
             Control Number
             <select onchange="location = this.value;">
@@ -687,7 +687,7 @@ table {
                 <th>Seminar/Workshop Attended</th>
                 <!-- <th>Email</th> -->
                 <!-- <th>Certificate</th> -->
-                <th>Action</th>
+                <th class="action-col">Action</th>
             </tr>
             <?php $rowNumber = $offset + 1; ?>
             <?php while ($row = $result->fetch_assoc()): ?>
