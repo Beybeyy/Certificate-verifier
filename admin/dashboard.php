@@ -157,7 +157,7 @@ $result = $conn->query($sql);
     h2 { color:#0b4a82; margin-top:0; }
 
     /* Top Nav */
-    .top-nav { background:#0b4a82; padding:15px 40px; display:flex; justify-content:space-between; align-items:center; color:#fff; position:relative; z-index:1000; }
+    .top-nav { background:#0b4a82; padding:15px 40px; display:flex; justify-content:space-between; align-items:center; color:#fff; position:sticky; top:0; z-index:1000; }
     .nav-brand { font-size:18px; font-weight:500; line-height:1.2; }
     .nav-links { display:flex; align-items:center; }
     .nav-links a { color:#fff; text-decoration:none; margin-left:35px; font-size:15px; font-weight:400; }
