@@ -1,4 +1,23 @@
-    <?php
+<?php
+$is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+           strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+
+// Handle CSV upload for AJAX requests
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
+    // Your existing upload code here...
+    
+    // If it's an AJAX request, return JSON response
+    if ($is_ajax) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => $inserted > 0,
+            'messages' => $messages,
+            'inserted' => $inserted,
+            'skipped' => $skipped
+        ]);
+        exit;
+    }
+}
 session_start();
 require_once __DIR__ . "/../config/db.php";
 
@@ -82,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                 $insert = $conn->prepare("
                     INSERT INTO certificates 
                     (control_number, temp_name, seminar_title, certificate_file)
-                    VALUES (?, ?, ?, NULL)
+                    VALUES (?, ?, ?, '')
                 ");
                 $insert->bind_param("sss", $control, $name, $title);
 
@@ -597,6 +616,25 @@ table {
     white-space: normal;
     overflow: visible;
 }
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loadingText {
+    display: none;
+    margin-left: 10px;
+    font-weight: bold;
+    color: #1976d2;
+    align-items: center;
+    gap: 5px;
+}
+
+#loadingText::before {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
     </style>
     </head>
     <body> 
@@ -626,7 +664,7 @@ table {
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <a href="../files/template.xlsx" download class="dbutton">Download Template</a>
                     <button id="uploadBtn" class="upload-btn">Upload</button>
-                     <span id="loadingText" style="display:none; margin-left:10px; font-weight:bold;">uploading...</span>
+                     
                     
                     <div class="search-container">
                         <input type="text" id="certificateSearch" placeholder="Search" onkeyup="filterTable()">
@@ -640,9 +678,13 @@ table {
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Upload Certificates (CSV)</h2>
-            <form method="POST" enctype="multipart/form-data" action="">
+            <form id="csvForm" method="POST" enctype="multipart/form-data" action="">
                 <input type="file" name="csv_file" accept=".csv" required>
                 <button type="submit">Upload CSV</button>
+                <span id="loadingText" style="display:none;">
+                    <span style="display: inline-block; animation: spin 1s linear infinite;">⏳</span>
+                    Uploading CSV...
+                </span>
             </form>
             <?php if (!empty($messages)): ?>
             <div class="messages">
@@ -772,10 +814,12 @@ table {
     // Burger menu toggle
     const burger = document.getElementById('burger');
     const navMenu = document.getElementById('nav-menu');
-    burger.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        burger.classList.toggle('toggle');
-    });
+    if (burger) {
+        burger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            burger.classList.toggle('toggle');
+        });
+    }
     document.querySelectorAll('.nav-links a').forEach(link=>{
         link.addEventListener('click',()=>{
             navMenu.classList.remove('active');
@@ -788,22 +832,26 @@ table {
     const uploadBtn = document.getElementById("uploadBtn");
     const spanClose = document.getElementsByClassName("close")[0];
 
-    uploadBtn.onclick = () => modal.style.display="block";
-    spanClose.onclick = () => modal.style.display="none";
-    window.onclick = e => { if(e.target==modal) modal.style.display="none"; }
+    if (uploadBtn) {
+        uploadBtn.onclick = () => modal.style.display = "block";
+    }
+    if (spanClose) {
+        spanClose.onclick = () => modal.style.display = "none";
+    }
+    window.onclick = e => { if(e.target == modal) modal.style.display = "none"; }
 
     function filterTable() {
         const input = document.getElementById("certificateSearch");
+        if (!input) return;
         const filter = input.value.toLowerCase();
         const table = document.querySelector("table");
+        if (!table) return;
         const tr = table.getElementsByTagName("tr");
 
-        // Loop through all table rows (except the header)
         for (let i = 1; i < tr.length; i++) {
             let match = false;
             const tds = tr[i].getElementsByTagName("td");
             
-            // Check Name, Email, and Control Number columns for a match
             for (let j = 0; j < tds.length; j++) {
                 if (tds[j] && tds[j].innerText.toLowerCase().indexOf(filter) > -1) {
                     match = true;
@@ -813,6 +861,7 @@ table {
             tr[i].style.display = match ? "" : "none";
         }
     }
+    
     function editName(btn, certId) {
         const row = btn.closest('tr');
         const text = row.querySelector('.name-text');
@@ -837,28 +886,106 @@ table {
         }
     }
 
-    // Function to handle clicking page numbers
     document.querySelectorAll('.page-num').forEach(button => {
         button.addEventListener('click', function() {
-            // Remove active class from all
             document.querySelectorAll('.page-num').forEach(b => b.classList.remove('active'));
-            // Add to clicked
             this.classList.add('active');
-            
             const page = parseInt(this.innerText);
             console.log("Navigating to page: " + page);
-            // Add your logic to filter/load data for the specific page here
         });
     });
+    
+    // FIXED: AJAX Form submission with loading indicator
     const form = document.getElementById('csvForm');
     const loadingText = document.getElementById('loadingText');
-    const submitBtn = document.getElementById('uploadBtn');
-
-    form.addEventListener('submit', function() {
-        // Show loading text and disable button
-        loadingText.style.display = 'inline';
-        submitBtn.disabled = true;
-    });
+    
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent page reload
+            
+            // Show loading indicator
+            if (loadingText) {
+                loadingText.style.display = 'inline';
+            }
+            
+            // Get the submit button and disable it
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Uploading...';
+            }
+            
+            // Create FormData object
+            const formData = new FormData(form);
+            
+            try {
+                // Send the file via fetch
+                const response = await fetch('', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                // Get the response text
+                const htmlResponse = await response.text();
+                
+                // Create a temporary div to parse the response
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlResponse;
+                
+                // Extract messages from the response
+                const messagesHtml = tempDiv.querySelector('.messages');
+                
+                // Update the messages in the modal
+                let messagesDiv = document.querySelector('.messages');
+                if (!messagesDiv) {
+                    // If messages div doesn't exist, create it
+                    messagesDiv = document.createElement('div');
+                    messagesDiv.className = 'messages';
+                    const modalContent = document.querySelector('.modal-content');
+                    if (modalContent) {
+                        modalContent.appendChild(messagesDiv);
+                    }
+                }
+                
+                if (messagesHtml) {
+                    messagesDiv.innerHTML = messagesHtml.innerHTML;
+                } else {
+                    // Check if there are any messages in the PHP session
+                    messagesDiv.innerHTML = '<p class="success">✅ Upload completed. Please refresh the page to see changes.</p>';
+                }
+                
+                // Refresh the table data after upload
+                setTimeout(() => {
+                    location.reload(); // Reload to show new data
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                // Show error message
+                let messagesDiv = document.querySelector('.messages');
+                if (!messagesDiv) {
+                    messagesDiv = document.createElement('div');
+                    messagesDiv.className = 'messages';
+                    const modalContent = document.querySelector('.modal-content');
+                    if (modalContent) {
+                        modalContent.appendChild(messagesDiv);
+                    }
+                }
+                messagesDiv.innerHTML = '<p class="error">❌ Upload failed. Please try again.</p>';
+                
+            } finally {
+                // Hide loading indicator
+                if (loadingText) {
+                    loadingText.style.display = 'none';
+                }
+                // Re-enable submit button
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Upload CSV';
+                }
+            }
+        });
+    }
 
     function prevPage() {
         console.log("Previous Page Clicked");
@@ -867,12 +994,11 @@ table {
     function nextPage() {
         console.log("Next Page Clicked");
     }
-  function toggleSeminar(cell) {    
-    cell.classList.toggle('expanded');
-}
-
     
-    </script>
+    function toggleSeminar(cell) {    
+        cell.classList.toggle('expanded');
+    }
+</script>
 
     </body>
     </html>
