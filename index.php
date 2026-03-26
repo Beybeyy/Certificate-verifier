@@ -59,7 +59,7 @@ if (isset($_GET['control_number'])) {
             position: relative;
             z-index: 1000;
         }
-        .nav-brand { font-size: 20px; font-weight: bold; line-height: 1.2; }
+        .nav-brand { font-size: 18px; font-weight: bold; line-height: 1.2; }
         .nav-brand strong { font-size: 22px; font-weight: 300; }
 
         /* Desktop Nav Links */
@@ -158,7 +158,8 @@ if (isset($_GET['control_number'])) {
 <nav class="top-nav">
     <div class="nav-brand">
         DEPARTMENT OF EDUCATION<br>
-        <strong>CerVer - Certificate Verifier</strong>
+            CSJDM CERVER<br>
+        Certificate Verifier System
     </div>
 
     <div class="nav-links" id="nav-menu">

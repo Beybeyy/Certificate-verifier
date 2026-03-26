@@ -603,7 +603,7 @@ table {
 
     <!-- TOP NAV -->
     <nav class="top-nav">
-        <div class="nav-brand">Department of Education<br>Certificate Verifier</div>
+        <div class="nav-brand">Department of Education<br>CSJDM Certificate Verifier</div>
         
         <div class="burger" id="burger">
             <span></span>

@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .nav-brand {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             line-height: 1.2;
         }
@@ -274,7 +274,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <nav class="top-nav">
     <div class="nav-brand">
         DEPARTMENT OF EDUCATION<br>
-        <strong>CerVer - Certificate Verifier</strong>
+            CSJDM CERVER<br>
+        Certificate Verifier System
+    </div>
     </div>
 
     <div class="nav-links" id="nav-menu">
