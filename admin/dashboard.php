@@ -1,4 +1,10 @@
 <?php
+// You don't have these at the top of your file:
+ini_set('upload_max_filesize', '100M');
+ini_set('post_max_size', '100M');
+ini_set('max_execution_time', 300);
+ini_set('memory_limit', '256M');
+
 $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 
@@ -54,69 +60,139 @@ if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
+/* ===== HANDLE CSV UPLOAD ===== */
+$messages = [];
+$inserted = 0;
+$skipped = 0;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
+
+    // Check for upload errors
+    if ($_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
+        $uploadErrors = [
+            UPLOAD_ERR_INI_SIZE => "The uploaded file exceeds the upload_max_filesize directive in php.ini",
+            UPLOAD_ERR_FORM_SIZE => "The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form",
+            UPLOAD_ERR_PARTIAL => "The uploaded file was only partially uploaded",
+            UPLOAD_ERR_NO_FILE => "No file was uploaded",
+            UPLOAD_ERR_NO_TMP_DIR => "Missing a temporary folder",
+            UPLOAD_ERR_CANT_WRITE => "Failed to write file to disk",
+            UPLOAD_ERR_EXTENSION => "A PHP extension stopped the file upload"
+        ];
+        $errorMsg = $uploadErrors[$_FILES['csv_file']['error']] ?? "Unknown upload error";
+        $messages[] = "❌ Upload failed: " . $errorMsg;
+        
+        if ($is_ajax) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'messages' => $messages,
+                'inserted' => 0,
+                'skipped' => 0
+            ]);
+            exit;
+        }
+    } else {
+        // Check file type
+        $fileType = mime_content_type($_FILES['csv_file']['tmp_name']);
+        $allowedTypes = ['text/csv', 'text/plain', 'application/vnd.ms-excel'];
+        
+        if (!in_array($fileType, $allowedTypes) && pathinfo($_FILES['csv_file']['name'], PATHINFO_EXTENSION) !== 'csv') {
+            $messages[] = "❌ Please upload a valid CSV file.";
+        } else {
+            $file = fopen($_FILES['csv_file']['tmp_name'], "r");
+            if (!$file) {
+                $messages[] = "❌ Failed to open CSV file.";
+            } else {
+                // Start transaction for better performance with large files
+                $conn->begin_transaction();
+                
+                try {
+                    fgetcsv($file); // skip header
+                    
+                    // Prepare statements for better performance
+                    $checkStmt = $conn->prepare("SELECT id FROM certificates WHERE control_number=?");
+                    $insertStmt = $conn->prepare("
+                        INSERT INTO certificates 
+                        (control_number, temp_name, seminar_title, certificate_file)
+                        VALUES (?, ?, ?, '')
+                    ");
+                    
+                    $batchSize = 100; // Process in batches for better memory management
+                    $counter = 0;
+                    
+                    while (($row = fgetcsv($file)) !== false) {
+                        // Skip empty rows
+                        if (count(array_filter($row)) === 0) continue;
+                        
+                        // CSV column order: control_number | name | seminar_title | teacher_email | certificate_file
+                        $control = isset($row[0]) ? trim($row[0]) : '';
+                        $name = isset($row[1]) ? trim($row[1]) : '';
+                        $title = isset($row[2]) ? trim($row[2]) : '';
+                        
+                        if (!$control || !$name || !$title) {
+                            $skipped++;
+                            continue;
+                        }
+                        
+                        // Check duplicate control number
+                        $checkStmt->bind_param("s", $control);
+                        $checkStmt->execute();
+                        if ($checkStmt->get_result()->num_rows > 0) {
+                            $skipped++;
+                            continue;
+                        }
+                        
+                        // Insert certificate
+                        $insertStmt->bind_param("sss", $control, $name, $title);
+                        
+                        if ($insertStmt->execute()) {
+                            $inserted++;
+                        } else {
+                            $skipped++;
+                        }
+                        
+                        $counter++;
+                        // Commit in batches to avoid memory issues
+                        if ($counter % $batchSize === 0) {
+                            $conn->commit();
+                            $conn->begin_transaction();
+                        }
+                    }
+                    
+                    // Final commit
+                    $conn->commit();
+                    
+                    $messages[] = "✅ Upload completed! Inserted: $inserted | Skipped: $skipped";
+                    
+                } catch (Exception $e) {
+                    $conn->rollback();
+                    $messages[] = "❌ Error during upload: " . $e->getMessage();
+                } finally {
+                    fclose($file);
+                    if (isset($checkStmt)) $checkStmt->close();
+                    if (isset($insertStmt)) $insertStmt->close();
+                }
+            }
+        }
+    }
+    
+    // If it's an AJAX request, return JSON response
+    if ($is_ajax) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => $inserted > 0,
+            'messages' => $messages,
+            'inserted' => $inserted,
+            'skipped' => $skipped
+        ]);
+        exit;
+    }
+}
+
 /* ===== PAGINATION SETUP ===== */
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $rowsPerPage = isset($_GET['rows']) ? (int)$_GET['rows'] : 10;
 $offset = ($page - 1) * $rowsPerPage;                                                                                                              
-
-/* ===== HANDLE CSV UPLOAD ===== */
-$messages = [];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
-
-    if ($_FILES['csv_file']['error'] !== 0) {
-        $messages[] = "❌ Please upload a valid CSV file.";
-    } else {
-
-        $file = fopen($_FILES['csv_file']['tmp_name'], "r");
-        if (!$file) {
-            $messages[] = "❌ Failed to open CSV file.";
-        } else {
-
-            fgetcsv($file); // skip header
-            $inserted = 0;
-            $skipped  = 0;
-
-            while (($row = fgetcsv($file)) !== false) {
-                if (count(array_filter($row)) === 0) continue;
-
-                // CSV column order: control_number | name | seminar_title | teacher_email | certificate_file
-                [$control, $name, $title] = array_map('trim', $row);
-
-                if (!$control || !$name || !$title) {
-                    $skipped++;
-                    continue;
-                }
-
-                // Check duplicate control number
-                $check = $conn->prepare("SELECT id FROM certificates WHERE control_number=?");
-                $check->bind_param("s", $control);
-                $check->execute();
-                if ($check->get_result()->num_rows > 0) {
-                    $skipped++;
-                    continue;
-                }
-
-                // Insert certificate with NULL for certificate_file
-                $insert = $conn->prepare("
-                    INSERT INTO certificates 
-                    (control_number, temp_name, seminar_title, certificate_file)
-                    VALUES (?, ?, ?, '')
-                ");
-                $insert->bind_param("sss", $control, $name, $title);
-
-                if ($insert->execute()) {
-                    $inserted++;
-                } else {
-                    $skipped++;
-                }
-            }
-
-            fclose($file);
-            $messages[] = "✅ Inserted: $inserted | ❌ Skipped: $skipped";
-        }
-    }
-}
 
 /* ===== SORTING ===== */
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
@@ -627,7 +703,7 @@ table {
     margin-left: 10px;
     font-weight: bold;
     color: #1976d2;
-    align-items: center;
+    align-items: center;a
     gap: 5px;
 }
 
