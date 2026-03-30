@@ -233,7 +233,8 @@
                 <div class="logos">
                     <img src="img/cerverlogo2.svg" alt="CerVer Logo" class="logo-img">
                     <img src="img/logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Seal" class="logo-img">
-                    <img src="http://localhost/log-in/LISproject/public/images/deped_matatag_logo.png" alt="DepEd Matatag Logo" class="logo-img">
+                    <img src="img/logo-deped-bagong-pilipinas-colored_orig.png" alt="DepEd Matatag Logo" class="logo-img">
+                    <img src="img/deped-ict-logo.jfif" alt="CerVer Logo" class="logo-img">
                 </div>
 
                 <div class="text-content">

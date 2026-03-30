@@ -24,7 +24,7 @@ if (isset($_GET['control_number'])) {
         }
     } else {
         $error = "⚠️ Please enter a control number.";
-    }
+    }   
 }
 ?>
 
@@ -59,7 +59,7 @@ if (isset($_GET['control_number'])) {
             position: relative;
             z-index: 1000;
         }
-        .nav-brand { font-size: 18px; font-weight: bold; line-height: 1.2; }
+        .nav-brand { font-size: 20px; font-weight: bold; line-height: 1.2; }
         .nav-brand strong { font-size: 22px; font-weight: 300; }
 
         /* Desktop Nav Links */
@@ -158,8 +158,7 @@ if (isset($_GET['control_number'])) {
 <nav class="top-nav">
     <div class="nav-brand">
         DEPARTMENT OF EDUCATION<br>
-            CSJDM CERVER<br>
-        Certificate Verifier System
+        <strong>CerVer - Certificate Verifier</strong>
     </div>
 
     <div class="nav-links" id="nav-menu">
@@ -176,7 +175,7 @@ if (isset($_GET['control_number'])) {
 </nav>
 
 <div class="logo-container">
-    <img src="img/sdologo.svg" alt="Logo">
+    <img src="img/sdologo (1).svg" alt="Logo">
     
 </div>
 
@@ -204,7 +203,7 @@ if (isset($_GET['control_number'])) {
                 <p><strong>Name:</strong> <?= htmlspecialchars($row['display_name']) ?></p>
                 <p><strong>Activity:</strong> <?= htmlspecialchars($row['seminar_title']) ?></p>
                 <h3><strong>Status:</strong> ✅ Verified</h3>
-                
+
                 <!-- <a href="<?= htmlspecialchars($row['certificate_file']) ?>" target="_blank" style="color:#1976d2;">View Certificate</a> -->
             </div>
         <?php endif; ?>
