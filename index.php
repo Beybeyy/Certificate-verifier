@@ -73,7 +73,7 @@ if (isset($_GET['control_number'])) {
 
         /* ===== LOGOS & PAGE CONTENT ===== */
         .logo-container { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 10px; }
-        .logo-container img { height: 200px; width: auto; object-fit: contain; }
+        .logo-container img { height: 150px; width: auto; object-fit: contain; }
 
         .page-wrapper { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
         .card {
