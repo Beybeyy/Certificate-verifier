@@ -8,22 +8,6 @@ ini_set('memory_limit', '256M');
 $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 
-// Handle CSV upload for AJAX requests
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
-    // Your existing upload code here...
-    
-    // If it's an AJAX request, return JSON response
-    if ($is_ajax) {
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => $inserted > 0,
-            'messages' => $messages,
-            'inserted' => $inserted,
-            'skipped' => $skipped
-        ]);
-        exit;
-    }
-}
 session_start();
 require_once __DIR__ . "/../config/db.php";
 
@@ -63,11 +47,12 @@ if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
 /* ===== HANDLE CSV UPLOAD ===== */
 $messages = [];
 $inserted = 0;
+$updated = 0;
 $skipped = 0;
+$skippedReasons = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 
-    // Check for upload errors
     if ($_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
         $uploadErrors = [
             UPLOAD_ERR_INI_SIZE => "The uploaded file exceeds the upload_max_filesize directive in php.ini",
@@ -78,117 +63,134 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
             UPLOAD_ERR_CANT_WRITE => "Failed to write file to disk",
             UPLOAD_ERR_EXTENSION => "A PHP extension stopped the file upload"
         ];
+
         $errorMsg = $uploadErrors[$_FILES['csv_file']['error']] ?? "Unknown upload error";
         $messages[] = "❌ Upload failed: " . $errorMsg;
-        
-        if ($is_ajax) {
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => false,
-                'messages' => $messages,
-                'inserted' => 0,
-                'skipped' => 0
-            ]);
-            exit;
-        }
     } else {
-        // Check file type
         $fileType = mime_content_type($_FILES['csv_file']['tmp_name']);
         $allowedTypes = ['text/csv', 'text/plain', 'application/vnd.ms-excel'];
-        
-        if (!in_array($fileType, $allowedTypes) && pathinfo($_FILES['csv_file']['name'], PATHINFO_EXTENSION) !== 'csv') {
+
+        if (!in_array($fileType, $allowedTypes) && strtolower(pathinfo($_FILES['csv_file']['name'], PATHINFO_EXTENSION)) !== 'csv') {
             $messages[] = "❌ Please upload a valid CSV file.";
         } else {
             $file = fopen($_FILES['csv_file']['tmp_name'], "r");
+
             if (!$file) {
                 $messages[] = "❌ Failed to open CSV file.";
             } else {
-                // Start transaction for better performance with large files
                 $conn->begin_transaction();
-                
+
                 try {
                     fgetcsv($file); // skip header
-                    
-                    // Prepare statements for better performance
-                    $checkStmt = $conn->prepare("SELECT id FROM certificates WHERE control_number=?");
+
+                    // IMPORTANT:
+                    // Dapat may UNIQUE KEY ang control_number sa database
+                    // para gumana nang tama ang ON DUPLICATE KEY UPDATE
+
                     $insertStmt = $conn->prepare("
-                        INSERT INTO certificates 
+                        INSERT INTO certificates
                         (control_number, temp_name, seminar_title, certificate_file)
                         VALUES (?, ?, ?, '')
+                        ON DUPLICATE KEY UPDATE
+                            temp_name = VALUES(temp_name),
+                            seminar_title = VALUES(seminar_title)
                     ");
-                    
-                    $batchSize = 100; // Process in batches for better memory management
+
+                    if (!$insertStmt) {
+                        throw new Exception("Prepare failed: " . $conn->error);
+                    }
+
+                    $batchSize = 100;
                     $counter = 0;
-                    
+                    $rowNumber = 1; // header row
+
                     while (($row = fgetcsv($file)) !== false) {
-                        // Skip empty rows
-                        if (count(array_filter($row)) === 0) continue;
-                        
-                        // CSV column order: control_number | name | seminar_title | teacher_email | certificate_file
-                        $control = isset($row[0]) ? trim($row[0]) : '';
-                        $name = isset($row[1]) ? trim($row[1]) : '';
-                        $title = isset($row[2]) ? trim($row[2]) : '';
-                        
-                        if (!$control || !$name || !$title) {
-                            $skipped++;
+                        $rowNumber++;
+
+                        // Skip fully empty rows
+                        if (!is_array($row) || count(array_filter($row, fn($v) => trim((string)$v) !== '')) === 0) {
                             continue;
                         }
-                        
-                        // Check duplicate control number
-                        $checkStmt->bind_param("s", $control);
-                        $checkStmt->execute();
-                        if ($checkStmt->get_result()->num_rows > 0) {
+
+                        // CSV: control_number | name | seminar_title | teacher_email | certificate_file
+                         $control = trim($row[0] ?? '');
+                         $name    = trim($row[1] ?? '');
+                         $title   = trim($row[2] ?? '');
+
+                        if ($control === '' || $name === '') {
                             $skipped++;
+
+                            $reason = "Row {$rowNumber} skipped: missing field";
+                            if ($control === '') $reason .= " [control_number empty]";
+                            if ($name === '')    $reason .= " [name empty]";
+                            if ($title === '')   $reason .= " [seminar_title empty]";
+
+                            $skippedReasons[] = $reason;
                             continue;
                         }
-                        
-                        // Insert certificate
+
                         $insertStmt->bind_param("sss", $control, $name, $title);
-                        
+
                         if ($insertStmt->execute()) {
-                            $inserted++;
+                            // MySQL behavior:
+                            // 1 = insert
+                            // 2 = update
+                            // 0 = duplicate found but same values, no actual change
+                            if ($insertStmt->affected_rows === 1) {
+                                $inserted++;
+                            } elseif ($insertStmt->affected_rows === 2) {
+                                $updated++;
+                            } else {
+                                $updated++;
+                            }
                         } else {
                             $skipped++;
+                            $skippedReasons[] = "Row {$rowNumber} failed insert: " . $insertStmt->error . " [control_number: {$control}]";
                         }
-                        
+
                         $counter++;
-                        // Commit in batches to avoid memory issues
+
                         if ($counter % $batchSize === 0) {
                             $conn->commit();
                             $conn->begin_transaction();
                         }
                     }
-                    
-                    // Final commit
+
                     $conn->commit();
-                    
-                    $messages[] = "✅ Upload completed! Inserted: $inserted | Skipped: $skipped";
-                    
+
+                    $messages[] = "✅ Upload completed! Inserted: $inserted | Updated: $updated | Skipped: $skipped";
+
+                    if (!empty($skippedReasons)) {
+                        $logFile = __DIR__ . "/skip_log_" . date("Ymd_His") . ".txt";
+                        file_put_contents($logFile, implode(PHP_EOL, $skippedReasons));
+                        $messages[] = "📄 Skip log saved: " . basename($logFile);
+                    }
+
                 } catch (Exception $e) {
                     $conn->rollback();
                     $messages[] = "❌ Error during upload: " . $e->getMessage();
                 } finally {
                     fclose($file);
-                    if (isset($checkStmt)) $checkStmt->close();
-                    if (isset($insertStmt)) $insertStmt->close();
+                    if (isset($insertStmt)) {
+                        $insertStmt->close();
+                    }
                 }
             }
         }
     }
-    
-    // If it's an AJAX request, return JSON response
+
     if ($is_ajax) {
         header('Content-Type: application/json');
         echo json_encode([
-            'success' => $inserted > 0,
+            'success' => ($inserted > 0 || $updated > 0),
             'messages' => $messages,
             'inserted' => $inserted,
+            'updated' => $updated,
             'skipped' => $skipped
         ]);
         exit;
     }
 }
-
 /* ===== PAGINATION SETUP ===== */
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $rowsPerPage = isset($_GET['rows']) ? (int)$_GET['rows'] : 10;
