@@ -39,8 +39,7 @@ if (isset($_GET['control_number'])) {
         * { box-sizing: border-box; }
         body {
             margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-            "Inter", sans-serif;  
+            font-family:'Poppins', "Inter", sans-serif;  
             background: #e4e4e6;
             color: #1a1a1a;
             display: flex;
@@ -50,7 +49,7 @@ if (isset($_GET['control_number'])) {
 
         /* ===== NAVIGATION (DESKTOP FIRST) ===== */
         .top-nav {
-            background-color: #0b4a82;
+            background-color: #0056b3;
             padding: 15px 40px;
             display: flex;
             justify-content: space-between;
@@ -158,7 +157,8 @@ if (isset($_GET['control_number'])) {
 <nav class="top-nav">
     <div class="nav-brand">
         DEPARTMENT OF EDUCATION<br>
-        <strong>CerVer - Certificate Verifier</strong>
+        <strong>CSJDM CerVer</strong> 
+        <p>Certificate Verification System</p>
     </div>
 
     <div class="nav-links" id="nav-menu">
