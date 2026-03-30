@@ -276,7 +276,7 @@ if (isset($_GET['control_number'])) {
         <?php endif; ?>
 
         <hr class="btn-loginlink">
-    <a href="login.php" class="login-account-link">Login account</a>
+    <a href="login.php" class="login-account-link">Login</a>
     </div>
 </div>
 
