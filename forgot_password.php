@@ -275,7 +275,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </nav>
 
 <div class="logo-container">
-<img src="img/sdologo (1).svg" alt="Logo">
+    <img src="img/sdo_logo.svg" alt="Logo">
+    
 </div>
 
 <main class="card-wrapper">
