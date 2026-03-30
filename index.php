@@ -35,11 +35,14 @@ if (isset($_GET['control_number'])) {
     <title>Home | CerVer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="img/cerverlogo2.svg">
+
     <style>
-        * { box-sizing: border-box; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        * { box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif;}
         body {
             margin: 0;
-            font-family:'Poppins', "Inter", sans-serif;  
+            font-family:'Poppins', sans-serif;  
             background: #e4e4e6;
             color: #1a1a1a;
             display: flex;
@@ -50,7 +53,7 @@ if (isset($_GET['control_number'])) {
         /* ===== NAVIGATION (DESKTOP FIRST) ===== */
         .top-nav {
             background-color: #0056b3;
-            padding: 15px 40px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -58,8 +61,70 @@ if (isset($_GET['control_number'])) {
             position: relative;
             z-index: 1000;
         }
-        .nav-brand { font-size: 20px; font-weight: bold; line-height: 1.2; }
-        .nav-brand strong { font-size: 22px; font-weight: 300; }
+            .nav-brand {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        .nav-brand {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        line-height: 1.2;
+        min-width: 0;
+    }
+
+
+            /* Top small text */
+            .brand-top {
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                opacity: 0.8;
+                margin: 0;
+            }
+
+            /* Main title */
+            .brand-title {
+                font-size: 16px;
+                font-weight: 700;
+                color: #fff;
+                margin: 0;
+            }
+
+            /* Subtitle */
+            .brand-subtitle {
+                font-size: 12px;
+                font-weight: 300;
+                opacity: 0.7;
+                margin: 0;
+            }
+
+            /* ===== RESPONSIVE (matches Tailwind scaling) ===== */
+            @media (min-width: 640px) {
+                .brand-top { font-size: 11px; }
+                .brand-title { font-size: 18px; }
+                .brand-subtitle { font-size: 13px; }
+            }
+
+            @media (min-width: 768px) {
+                .brand-top { font-size: 12px; letter-spacing: 0.18em; }
+                .brand-title { font-size: 20px; }
+                .brand-subtitle { font-size: 14px; }
+            }
+
+            @media (min-width: 1024px) {
+                .brand-title { font-size: 22px; }
+                .brand-subtitle { font-size: 15px; }
+            }
+
+            .nav-brand p,
+            .nav-brand h1 {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
 
         /* Desktop Nav Links */
         .nav-links { display: flex; gap: 30px; align-items: center; }
@@ -155,11 +220,13 @@ if (isset($_GET['control_number'])) {
 <body>
 
 <nav class="top-nav">
-    <div class="nav-brand">
-        DEPARTMENT OF EDUCATION<br>
-        <strong>CSJDM CerVer</strong> 
-        <p>Certificate Verification System</p>
-    </div>
+   <div class="nav-brand">
+    <p class="brand-top">Department of Education</p>
+    <h1 class="brand-title">CSJDM CERVER</h1>
+    <p class="brand-subtitle">
+        Certificate Verifier System
+    </p>
+</div>
 
     <div class="nav-links" id="nav-menu">
         <a href="index.php">Home</a>
