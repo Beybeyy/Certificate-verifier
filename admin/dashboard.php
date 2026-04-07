@@ -249,13 +249,88 @@ $result = $conn->query($sql);
     <link rel="icon" type="image/png" href="img/cerverlogo2.svg">
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        * { 
+            font-family: 'Poppins', sans-serif;}
     /* General */
     body { margin:0; font-family:"Segoe UI", Arial, sans-serif; background:#fff; color:#1a1a1a; display:flex; flex-direction:column; min-height:100vh; overflow-x:hidden; }
     h2 { color:#0b4a82; margin-top:0; }
 
     /* Top Nav */
-    .top-nav { background:#0b4a82; padding:15px 40px; display:flex; justify-content:space-between; align-items:center; color:#fff; position:sticky; top:0; z-index:1000; }
-    .nav-brand { font-size:18px; font-weight:500; line-height:1.2; }
+    .top-nav {
+            background-color: #0056b3;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #ffffff;
+            position: relative;
+            z-index: 1000;
+        }
+            .nav-brand {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        .nav-brand {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        line-height: 1.2;
+        min-width: 0;
+    }
+
+
+            /* Top small text */
+            .brand-top {
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                opacity: 0.8;
+                margin: 0;
+            }
+
+            /* Main title */
+            .brand-title {
+                font-size: 16px;
+                font-weight: 700;
+                color: #fff;
+                margin: 0;
+            }
+
+            /* Subtitle */
+            .brand-subtitle {
+                font-size: 12px;
+                font-weight: 300;
+                opacity: 0.7;
+                margin: 0;
+            }
+
+            /* ===== RESPONSIVE (matches Tailwind scaling) ===== */
+            @media (min-width: 640px) {
+                .brand-top { font-size: 11px; }
+                .brand-title { font-size: 18px; }
+                .brand-subtitle { font-size: 13px; }
+            }
+
+            @media (min-width: 768px) {
+                .brand-top { font-size: 12px; letter-spacing: 0.18em; }
+                .brand-title { font-size: 20px; }
+                .brand-subtitle { font-size: 14px; }
+            }
+
+            @media (min-width: 1024px) {
+                .brand-title { font-size: 22px; }
+                .brand-subtitle { font-size: 15px; }
+            }
+
+            .nav-brand p,
+            .nav-brand h1 {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
     .nav-links { display:flex; align-items:center; }
     .nav-links a { color:#fff; text-decoration:none; margin-left:35px; font-size:15px; font-weight:400; }
     .nav-links a:hover { text-decoration:underline; }
@@ -352,6 +427,7 @@ $result = $conn->query($sql);
         font-size: 13px; /* Slightly smaller text */
         color: #333;
         margin-bottom: 2px;
+        position: sticky;
     }
 
     .footer-right {
@@ -714,13 +790,34 @@ table {
     display: inline-block;
     animation: spin 1s linear infinite;
 }
+.table-container {
+    max-height: 700px; /* pwede mo baguhin (300px, 500px, etc.) */
+    overflow-y: auto;
+    border: 1px solid #ccc;
+}
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-container th {
+    position: sticky;
+    top: 0;
+    z-index: 2
+}
     </style>
     </head>
     <body> 
 
     <!-- TOP NAV -->
-    <nav class="top-nav">
-        <div class="nav-brand">Department of Education<br>CSJDM Certificate Verifier</div>
+   <nav class="top-nav">
+   <div class="nav-brand">
+    <p class="brand-top">Department of Education</p>
+    <h1 class="brand-title">CITY OF SAN JOSE DEL MONTE</h1>
+    <p class="brand-subtitle">
+        Certificate Verifier System - CERVER
+    </p>
+</div>
         
         <div class="burger" id="burger">
             <span></span>
@@ -818,6 +915,7 @@ table {
     </div>
 
         <?php if ($result->num_rows > 0): ?>
+            <div class="table-container">
         <table>
             <?php $rowNumber = 1; ?>
             <tr>
@@ -886,7 +984,7 @@ table {
             </tr>
             <?php endwhile; ?>
         </table>
-
+     </div>
         <?php else: ?>
         <p>No certificates found.</p>
         <?php endif; ?>
