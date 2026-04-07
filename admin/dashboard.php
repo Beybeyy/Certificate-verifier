@@ -745,7 +745,7 @@ th.action-col, td.action-col {
 
 /* Optional: keep text tidy */
 th, td {
-    overflow: hidden;
+    
     text-overflow: ellipsis;
     white-space: nowrap;
     text-align: center;
