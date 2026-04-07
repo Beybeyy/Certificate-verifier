@@ -720,27 +720,27 @@ $result = $conn->query($sql);
 /* Fixed sizes for each table column */
 th.no-col, td.no-col {
     width: 43px; /* was 58px */
-    height: 92px;
+    height: 60px;
 }
 
 th.control-col, td.control-col {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
     width: 137px;
-    height: 92px;
+    height: 60px;
 }
 
 th.name-col, td.name-col {
     width: 276.89px;
-    height: 92px;
+    height: 60px;
 }
 
 th.seminar-col, td.seminar-col {
     width: 570.79px;
-    height: 92px;
+    height: 60px;
 }
 
 th.action-col, td.action-col {
     width: 64.99px; /* was 79.99px */
-    height: 92px;
+    height: 60px;
 }
 
 /* Optional: keep text tidy */
