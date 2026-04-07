@@ -38,6 +38,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_name'])) {
     exit;
 }
 
+/* ===== BULK DELETE ===== */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_selected'])) {
+    $ids = $_POST['selected_ids'] ?? [];
+
+    if (!empty($ids) && is_array($ids)) {
+        $ids = array_map('intval', $ids);
+        $ids = array_filter($ids);
+
+        if (!empty($ids)) {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $types = str_repeat('i', count($ids));
+
+            $stmt = $conn->prepare("DELETE FROM certificates WHERE id IN ($placeholders)");
+            $stmt->bind_param($types, ...$ids);
+            $stmt->execute();
+        }
+    }
+
+    exit;
+}
+
 /* ===== ADMIN CHECK ===== */
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
@@ -215,6 +236,19 @@ switch ($sort) {
         break;
 }
 
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+$where = "";
+
+if ($search !== '') {
+    $safeSearch = $conn->real_escape_string($search);
+    $where = "WHERE 
+        c.control_number LIKE '%$safeSearch%' OR
+        c.seminar_title LIKE '%$safeSearch%' OR
+        u.name LIKE '%$safeSearch%' OR
+        c.temp_name LIKE '%$safeSearch%' OR
+        c.teacher_email_pending LIKE '%$safeSearch%'";
+}
 /* ===== FETCH CERTIFICATES ===== */
 $sql = "
     SELECT 
@@ -230,11 +264,20 @@ $sql = "
     FROM certificates c
     LEFT JOIN users u 
         ON c.teacher_id = u.id
+    $where
     $orderBy
     LIMIT $rowsPerPage OFFSET $offset
 ";
 
-$totalResult = $conn->query("SELECT COUNT(*) AS total FROM certificates");
+$countSql = "
+    SELECT COUNT(*) AS total
+    FROM certificates c
+    LEFT JOIN users u 
+        ON c.teacher_id = u.id
+    $where
+";
+
+$totalResult = $conn->query($countSql);
 $totalRows = $totalResult->fetch_assoc()['total'];
 $result = $conn->query($sql);
 ?>
@@ -384,6 +427,64 @@ $result = $conn->query($sql);
     }
     .dlbtn:hover { background:#e68a00; text-decoration:none; }
 
+    .delete-toggle-btn {
+    background: #e53935;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.delete-toggle-btn:hover {
+    background: #c62828;
+}
+
+.delete-selected-btn {
+    background: #b71c1c;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    display: none;
+}
+
+.delete-selected-btn:hover {
+    background: #8e0000;
+}
+
+.cancel-delete-btn {
+    background: #757575;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    display: none;
+}
+
+.cancel-delete-btn:hover {
+    background: #5f5f5f;
+}
+
+.delete-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.row-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+
+
     /* Search Bar Container */
     .search-container {
         position: relative;
@@ -410,8 +511,21 @@ $result = $conn->query($sql);
 
     /* Table */
     table { width:100%; border-collapse:collapse; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.05); }
-    th, td { padding:12px 15px; border:1px solid #ddd; text-align:center; }
-    th { background:#1976d2; color:#fff; }
+    th, td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: center;
+    }
+    th {
+    background: #1976d2;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    }
+
+    td {
+        font-size: 12px;
+    }
     tr:nth-child(even){ background:#f9f9f9; }
     tr:hover{ background:#e3f2fd; }
 
@@ -450,6 +564,23 @@ $result = $conn->query($sql);
         font-size: 13px;
         margin-left: 5px;
     }
+
+    .footer-filter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #5c7c99;
+    font-size: 13px;
+}
+
+.footer-filter select {
+    padding: 2px 5px;
+    border: 1px solid #1976d2;
+    border-radius: 4px;
+    color: #0b4a82;
+    background: transparent;
+    font-size: 13px;
+}
 
     /* Compact Pagination Buttons */
     .pagination-controls {
@@ -744,15 +875,34 @@ th.action-col, td.action-col {
 }
 
 /* Optional: keep text tidy */
-th, td {
+th {
+    font-size: 14px;
+}
+
+td {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     text-align: center;
     vertical-align: middle;
-    cursor: pointer;
     position: relative;
+    font-size: 11px;
+    padding: 6px 8px;
 }
+
+.select-col,
+.select-cell {
+    display: none;
+    width: 50px;
+    text-align: center;
+}
+
+.table-container.delete-mode .select-col,
+.table-container.delete-mode .select-cell {
+    display: table-cell;
+}
+
+
 
 /* Table fixed layout */
 table {
@@ -805,6 +955,108 @@ table {
     top: 0;
     z-index: 2;
 }
+
+/* ===== RESPONSIVE (790px pababa) ===== */
+@media (max-width: 790px) {
+
+    /* MAIN CONTAINER spacing */
+    .main-container {
+        margin: 10px;
+    }
+
+    /* HEADER (Admin Dashboard + buttons) */
+    .main-container > div:first-child {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    /* Controls (Upload, Delete, Search) */
+    .main-container > div:first-child > div {
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: space-between;
+    }
+
+    /* Buttons full width on mobile */
+    .upload-btn,
+    .delete-toggle-btn,
+    .delete-selected-btn,
+    .cancel-delete-btn,
+    .dbutton {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Search bar full width */
+    .search-container {
+        width: 100%;
+    }
+
+    .search-container input {
+        width: 100%;
+    }
+
+    /* TABLE SCROLL FIX */
+    .table-container {
+        overflow-x: auto;
+        max-height: 500px;
+    }
+
+    table {
+        min-width: 700px; /* prevents squishing */
+    }
+
+    /* TEXT SIZE smaller for mobile */
+    th {
+        font-size: 12px;
+    }
+
+    td {
+        font-size: 11px;
+        padding: 8px;
+    }
+
+    /* ACTION BUTTON */
+    .edit-btn {
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+
+    /* PAGINATION FOOTER */
+    .pagination-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .footer-right {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        width: 100%;
+    }
+
+    /* Row per page + filters stack */
+    .row-select-wrapper,
+    .footer-filter {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* Pagination buttons wrap */
+    .pagination-controls {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    /* CHECKBOX column spacing */
+    .select-col,
+    .select-cell {
+        width: 40px;
+    }
+}
     </style>
     </head>
     <body> 
@@ -837,15 +1089,26 @@ table {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2>Admin Dashboard</h2>
                 
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <a href="../files/template.xlsx" download class="dbutton">Download Template</a>
-                    <button id="uploadBtn" class="upload-btn">Upload</button>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <a href="../files/template.xlsx" download class="dbutton">Download Template</a>
+    <button id="uploadBtn" class="upload-btn">Upload</button>
+
+    <div class="delete-actions">
+        <button type="button" id="selectBtn" class="delete-toggle-btn" onclick="toggleDeleteMode()">Select</button>
+        <button type="button" id="deleteSelectedBtn" class="delete-selected-btn" onclick="deleteSelected()">Delete Selected</button>
+        <button type="button" id="cancelDeleteBtn" class="cancel-delete-btn" onclick="cancelDeleteMode()">Cancel</button>
+    </div>
                      
                     
                     <div class="search-container">
-                        <input type="text" id="certificateSearch" placeholder="Search" onkeyup="filterTable()">
-                        <span class="search-icon">🔍</span>
-                    </div>
+                <input type="text"
+                    id="certificateSearch"
+                    placeholder="Search"
+                    value="<?= htmlspecialchars($search) ?>"
+                    onkeydown="handleSearch(event)"
+                    autocomplete="off">
+                <span class="search-icon">🔍</span>
+            </div>
                 </div>
             </div>
 
@@ -884,15 +1147,31 @@ table {
         
         <div class="footer-right">
             <div class="row-select-wrapper">
-                Row per page: 
-            <select onchange="location.href='?page=<?= $page ?>&rows='+this.value+'&sort=<?= urlencode($sort) ?>'">
-                    <option value="100" <?= $rowsPerPage==100 ? 'selected' : '' ?>>100</option>
-                    <option value="50" <?= $rowsPerPage==50 ? 'selected' : '' ?>>50</option>
-                    <option value="30" <?= $rowsPerPage==30 ? 'selected' : '' ?>>30</option>
-                    <option value="20" <?= $rowsPerPage==20 ? 'selected' : '' ?>>20</option>
-                    <option value="10" <?= $rowsPerPage==10 ? 'selected' : '' ?>>10</option>
-                </select>
-            </div>
+    Row per page: 
+    <select onchange="updateTableControls({ rows: this.value })">
+        <option value="100" <?= $rowsPerPage==100 ? 'selected' : '' ?>>100</option>
+        <option value="50" <?= $rowsPerPage==50 ? 'selected' : '' ?>>50</option>
+        <option value="30" <?= $rowsPerPage==30 ? 'selected' : '' ?>>30</option>
+        <option value="20" <?= $rowsPerPage==20 ? 'selected' : '' ?>>20</option>
+        <option value="10" <?= $rowsPerPage==10 ? 'selected' : '' ?>>10</option>
+    </select>
+</div>
+
+<div class="footer-filter">
+    <span>Control #:</span>
+    <select onchange="updateTableControls({ sort: this.value })">
+        <option value="control_new" <?= ($sort=='control_new') ? 'selected' : '' ?>>New</option>
+        <option value="control_old" <?= ($sort=='control_old') ? 'selected' : '' ?>>Old</option>
+    </select>
+</div>
+
+<div class="footer-filter">
+    <span>Name:</span>
+    <select onchange="updateTableControls({ sort: this.value })">
+        <option value="name_asc" <?= ($sort=='name_asc') ? 'selected' : '' ?>>A - Z</option>
+        <option value="name_desc" <?= ($sort=='name_desc') ? 'selected' : '' ?>>Z - A</option>
+    </select>
+</div>
 
             <div class="pagination-controls">
                 <!-- Previous arrow -->
@@ -919,43 +1198,22 @@ table {
         <table>
             <?php $rowNumber = 1; ?>
             <tr>
-                <th class="no-col">No.</th>
-            <th>
-    Control Number
-    <select onchange="location = this.value;">
-        <option value="?page=<?= $page ?>&rows=<?= $rowsPerPage ?>&sort=control_new"
-            <?= ($sort=='control_new') ? 'selected' : '' ?>>
-            New
-        </option>
-        <option value="?page=<?= $page ?>&rows=<?= $rowsPerPage ?>&sort=control_old"
-            <?= ($sort=='control_old') ? 'selected' : '' ?>>
-            Old
-        </option>
-    </select>
-</th>
-
-<th>
-    Name
-    <select onchange="location = this.value;">
-        <option value="?page=<?= $page ?>&rows=<?= $rowsPerPage ?>&sort=name_asc"
-            <?= ($sort=='name_asc') ? 'selected' : '' ?>>
-            A - Z
-        </option>
-        <option value="?page=<?= $page ?>&rows=<?= $rowsPerPage ?>&sort=name_desc"
-            <?= ($sort=='name_desc') ? 'selected' : '' ?>>
-            Z - A
-        </option>
-    </select>
-</th>
-                <th>Seminar/Workshop Attended</th>
-                <!-- <th>Email</th> -->
-                <!-- <th>Certificate</th> -->
-                <th class="action-col">Action</th>
-            </tr>
+    <th class="select-col">
+        <input type="checkbox" id="selectAllRows" onclick="toggleSelectAll(this)">
+    </th>
+    <th class="no-col">No.</th>
+    <th class="control-col">Control Number</th>
+    <th class="name-col">Name</th>
+    <th class="seminar-col">Seminar/Workshop Attended</th>
+    <th class="action-col">Action</th>
+</tr>
             <?php $rowNumber = $offset + 1; ?>
             <?php while ($row = $result->fetch_assoc()): ?>
             <tr>
-                <td><?= $rowNumber++ ?></td>
+    <td class="select-cell">
+        <input type="checkbox" class="row-checkbox" value="<?= $row['cert_id'] ?>">
+    </td>
+    <td><?= $rowNumber++ ?></td>
                 <td><?= htmlspecialchars($row['control_number']) ?></td>
                 <td>
                     <span class="name-text">
@@ -1178,6 +1436,114 @@ table {
     function toggleSeminar(cell) {    
         cell.classList.toggle('expanded');
     }
+
+    function updateTableControls(params = {}) {
+    const url = new URL(window.location.href);
+
+    if (params.rows !== undefined) {
+        url.searchParams.set('rows', params.rows);
+        url.searchParams.set('page', 1);
+    }
+
+    if (params.sort !== undefined) {
+        url.searchParams.set('sort', params.sort);
+        url.searchParams.set('page', 1);
+    }
+
+    window.location.href = url.toString();
+}
+
+function toggleDeleteMode() {
+    const tableContainer = document.querySelector('.table-container');
+    const selectBtn = document.getElementById('selectBtn');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    const selectAll = document.getElementById('selectAllRows');
+
+    if (!tableContainer || !selectBtn || !deleteSelectedBtn || !cancelDeleteBtn) return;
+
+    tableContainer.classList.add('delete-mode');
+
+    selectBtn.style.display = 'none';
+    deleteSelectedBtn.style.display = 'inline-block';
+    cancelDeleteBtn.style.display = 'inline-block';
+
+    if (selectAll) selectAll.checked = false;
+    document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+}
+
+function cancelDeleteMode() {
+    const tableContainer = document.querySelector('.table-container');
+    const selectBtn = document.getElementById('selectBtn');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    const selectAll = document.getElementById('selectAllRows');
+
+    if (!tableContainer || !selectBtn || !deleteSelectedBtn || !cancelDeleteBtn) return;
+
+    tableContainer.classList.remove('delete-mode');
+
+    selectBtn.style.display = 'inline-block';
+    deleteSelectedBtn.style.display = 'none';
+    cancelDeleteBtn.style.display = 'none';
+
+    if (selectAll) selectAll.checked = false;
+    document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+}
+
+function toggleSelectAll(source) {
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    checkboxes.forEach(cb => cb.checked = source.checked);
+}
+
+function deleteSelected() {
+    const checked = document.querySelectorAll('.row-checkbox:checked');
+
+    if (checked.length === 0) {
+        alert('Please select at least one row to delete.');
+        return;
+    }
+
+    if (!confirm('Are you sure you want to delete the selected record(s)?')) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('delete_selected', '1');
+
+    checked.forEach(cb => {
+        formData.append('selected_ids[]', cb.value);
+    });
+
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log(data);
+        location.reload();
+    })
+    .catch(error => {
+        console.error('Delete error:', error);
+        alert('Delete failed.');
+    });
+}
+function handleSearch(event) {
+    if (event.key === 'Enter') {
+        const searchValue = document.getElementById('certificateSearch').value.trim();
+        const url = new URL(window.location.href);
+
+        if (searchValue !== '') {
+            url.searchParams.set('search', searchValue);
+        } else {
+            url.searchParams.delete('search');
+        }
+
+        url.searchParams.set('page', 1);
+        window.location.href = url.toString();
+    }
+}
 </script>
 
     </body>
