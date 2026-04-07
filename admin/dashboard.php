@@ -745,7 +745,7 @@ th.action-col, td.action-col {
 
 /* Optional: keep text tidy */
 th, td {
-    
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     text-align: center;
@@ -803,7 +803,7 @@ table {
 .table-container th {
     position: sticky;
     top: 0;
-    z-index: 2
+    z-index: 2;
 }
     </style>
     </head>
@@ -915,7 +915,7 @@ table {
     </div>
 
         <?php if ($result->num_rows > 0): ?>
-            <div class="table-container">
+    <div class="table-container">
         <table>
             <?php $rowNumber = 1; ?>
             <tr>
