@@ -346,11 +346,12 @@ $result = $conn->query($sql);
         justify-content: space-between;
         align-items: center;
         padding: 10px 20px; /* Thinner padding */
-        background-color: #f8fbff; /* Very light blue tint */
+        background-color: #f5faff; /* Very light blue tint */
         border: 1px solid #e0e0e0;
         border-top: none;
         font-size: 13px; /* Slightly smaller text */
         color: #333;
+        margin-bottom: 2px;
     }
 
     .footer-right {
@@ -775,6 +776,46 @@ table {
             <?php endif; ?>
         </div>
         </div>  
+            <div class="pagination-footer">
+        <div class="footer-left">
+            <?php
+            $start = $offset + 1;
+            $end = min($offset + $rowsPerPage, $totalRows);
+            ?>
+            Showing <b><?= $start ?></b> to <b><?= $end ?></b> of <b><?= $totalRows ?></b> teachers
+        </div>
+        
+        <div class="footer-right">
+            <div class="row-select-wrapper">
+                Row per page: 
+            <select onchange="location.href='?page=<?= $page ?>&rows='+this.value+'&sort=<?= urlencode($sort) ?>'">
+                    <option value="100" <?= $rowsPerPage==100 ? 'selected' : '' ?>>100</option>
+                    <option value="50" <?= $rowsPerPage==50 ? 'selected' : '' ?>>50</option>
+                    <option value="30" <?= $rowsPerPage==30 ? 'selected' : '' ?>>30</option>
+                    <option value="20" <?= $rowsPerPage==20 ? 'selected' : '' ?>>20</option>
+                    <option value="10" <?= $rowsPerPage==10 ? 'selected' : '' ?>>10</option>
+                </select>
+            </div>
+
+            <div class="pagination-controls">
+                <!-- Previous arrow -->
+                <a class="page-arrow" href="?page=<?= max(1, $page-1) ?>&rows=<?= $rowsPerPage ?>&sort=<?= urlencode($sort) ?>">❮</a>
+
+                <?php
+                $totalPages = ceil($totalRows / $rowsPerPage);
+                // Show up to 10 page numbers (adjustable)
+                $startPage = max(1, $page - 4);
+                $endPage = min($totalPages, $page + 5);
+
+                for ($i = $startPage; $i <= $endPage; $i++): ?>
+                    <a class="page-num <?= $i==$page ? 'active' : '' ?>" href="?page=<?= $i ?>&rows=<?= $rowsPerPage ?>&sort=<?= urlencode($sort) ?>"><?= $i ?></a>
+                <?php endfor; ?>
+
+                <!-- Next arrow -->
+                <a class="page-arrow" href="?page=<?= min($totalPages, $page+1) ?>&rows=<?= $rowsPerPage ?>&sort=<?= urlencode($sort) ?>">❯</a>
+            </div>
+        </div>
+    </div>
 
         <?php if ($result->num_rows > 0): ?>
         <table>
@@ -782,28 +823,32 @@ table {
             <tr>
                 <th class="no-col">No.</th>
             <th>
-            Control Number
-            <select onchange="location = this.value;">
-                <option value="?page=1&rows=<?= $rowsPerPage ?>&sort=control_new"
-                    <?= ($sort=='control_new')?'selected':'' ?>>New</option>
-                <option value="?page=1&rows=<?= $rowsPerPage ?>&sort=control_old"
-                    <?= ($sort=='control_old')?'selected':'' ?>>Old</option>
-            </select>
-        </th>
+    Control Number
+    <select onchange="location = this.value;">
+        <option value="?page=<?= $page ?>&rows=<?= $rowsPerPage ?>&sort=control_new"
+            <?= ($sort=='control_new') ? 'selected' : '' ?>>
+            New
+        </option>
+        <option value="?page=<?= $page ?>&rows=<?= $rowsPerPage ?>&sort=control_old"
+            <?= ($sort=='control_old') ? 'selected' : '' ?>>
+            Old
+        </option>
+    </select>
+</th>
 
-        <th>
-            Name
-            <select onchange="location = this.value;">
-                <option value="?page=1&rows=<?= $rowsPerPage ?>&sort=name_asc"
-                    <?= ($sort=='name_asc')?'selected':'' ?>>
-                    A - Z
-                </option>
-                <option value="?page=1&rows=<?= $rowsPerPage ?>&sort=name_desc"
-                    <?= ($sort=='name_desc')?'selected':'' ?>>
-                    Z - A
-                </option>
-        </select>
-    </th>
+<th>
+    Name
+    <select onchange="location = this.value;">
+        <option value="?page=<?= $page ?>&rows=<?= $rowsPerPage ?>&sort=name_asc"
+            <?= ($sort=='name_asc') ? 'selected' : '' ?>>
+            A - Z
+        </option>
+        <option value="?page=<?= $page ?>&rows=<?= $rowsPerPage ?>&sort=name_desc"
+            <?= ($sort=='name_desc') ? 'selected' : '' ?>>
+            Z - A
+        </option>
+    </select>
+</th>
                 <th>Seminar/Workshop Attended</th>
                 <!-- <th>Email</th> -->
                 <!-- <th>Certificate</th> -->
@@ -841,47 +886,6 @@ table {
             </tr>
             <?php endwhile; ?>
         </table>
-
-            <div class="pagination-footer">
-        <div class="footer-left">
-            <?php
-            $start = $offset + 1;
-            $end = min($offset + $rowsPerPage, $totalRows);
-            ?>
-            Showing <b><?= $start ?></b> to <b><?= $end ?></b> of <b><?= $totalRows ?></b> teachers
-        </div>
-        
-        <div class="footer-right">
-            <div class="row-select-wrapper">
-                Row per page: 
-            <select onchange="location.href='?page=1&rows='+this.value">
-                    <option value="100" <?= $rowsPerPage==100 ? 'selected' : '' ?>>100</option>
-                    <option value="50" <?= $rowsPerPage==50 ? 'selected' : '' ?>>50</option>
-                    <option value="30" <?= $rowsPerPage==30 ? 'selected' : '' ?>>30</option>
-                    <option value="20" <?= $rowsPerPage==20 ? 'selected' : '' ?>>20</option>
-                    <option value="10" <?= $rowsPerPage==10 ? 'selected' : '' ?>>10</option>
-                </select>
-            </div>
-
-            <div class="pagination-controls">
-                <!-- Previous arrow -->
-                <a class="page-arrow" href="?page=<?= max(1, $page-1) ?>&rows=<?= $rowsPerPage ?>">❮</a>
-
-                <?php
-                $totalPages = ceil($totalRows / $rowsPerPage);
-                // Show up to 10 page numbers (adjustable)
-                $startPage = max(1, $page - 4);
-                $endPage = min($totalPages, $page + 5);
-
-                for ($i = $startPage; $i <= $endPage; $i++): ?>
-                    <a class="page-num <?= $i==$page ? 'active' : '' ?>" href="?page=<?= $i ?>&rows=<?= $rowsPerPage ?>"><?= $i ?></a>
-                <?php endfor; ?>
-
-                <!-- Next arrow -->
-                <a class="page-arrow" href="?page=<?= min($totalPages, $page+1) ?>&rows=<?= $rowsPerPage ?>">❯</a>
-            </div>
-        </div>
-    </div>
 
         <?php else: ?>
         <p>No certificates found.</p>

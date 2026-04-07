@@ -327,11 +327,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
 <nav class="top-nav">
-    <div class="nav-brand">
+   <div class="nav-brand">
     <p class="brand-top">Department of Education</p>
-    <h1 class="brand-title">CSJDM CERVER</h1>
+    <h1 class="brand-title">CITY OF SAN JOSE DEL MONTE</h1>
     <p class="brand-subtitle">
-        Certificate Verifier System
+        Certificate Verifier System - CERVER
     </p>
 </div>
 
