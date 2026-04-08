@@ -259,21 +259,50 @@ if (isset($_GET['ajax_live_search'])) {
     ";
 
     $result = $conn->query($sql);
+    $rowNumber = 1;
 
-    while ($row = $result->fetch_assoc()) {
-        echo "<tr>";
-        echo "<td></td>"; // checkbox column if needed
-        echo "<td>" . htmlspecialchars($row['control_number']) . "</td>";
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
 
-        $name = $row['user_name']
-            ?? $row['temp_name']
-            ?? (isset($row['display_email']) ? explode('@', $row['display_email'])[0] : 'Not registered');
+            $displayName =
+                $row['user_name']
+                ?? $row['temp_name']
+                ?? (isset($row['display_email']) ? explode('@', $row['display_email'])[0] : 'Not registered');
 
-        echo "<td>" . htmlspecialchars($name) . "</td>";
-        echo "<td>" . htmlspecialchars($row['seminar_title']) . "</td>";
+            $inputValue =
+                $row['temp_name']
+                ?? $row['user_name']
+                ?? (isset($row['display_email']) ? explode('@', $row['display_email'])[0] : '');
 
-        echo "<td><button class='edit-btn'>Edit</button></td>";
-        echo "</tr>";
+            echo "<tr>";
+            echo '<td class="select-cell"><input type="checkbox" class="row-checkbox" value="' . (int)$row['cert_id'] . '"></td>';
+            echo '<td class="no-col">' . $rowNumber++ . '</td>';
+            echo '<td class="control-col">' . htmlspecialchars($row['control_number']) . '</td>';
+            echo '<td class="name-col">
+                    <span class="name-text">' . htmlspecialchars($displayName) . '</span>
+                    <input type="text"
+                           class="name-input"
+                           value="' . htmlspecialchars($inputValue) . '"
+                           style="display:none; width:120px;">
+                  </td>';
+            echo '<td class="seminar-col seminar-cell" onclick="toggleSeminar(this)">' . htmlspecialchars($row['seminar_title']) . '</td>';
+            echo '<td class="action-col">
+                    <button class="edit-btn" onclick="editName(this, ' . (int)$row['cert_id'] . ')">Edit</button>
+                  </td>';
+            echo "</tr>";
+        }
+    } else {
+       echo '
+        <tr>
+            <td colspan="6" style="
+                text-align:center;
+                padding:40px 0;
+                color:#777;
+                font-size:14px;
+            ">
+                🔍 No matching results found
+            </td>
+        </tr>';
     }
 
     exit;
@@ -1064,6 +1093,7 @@ $result = $conn->query($sql);
                        placeholder="Search"
                        value="<?= htmlspecialchars($search) ?>"
                         oninput="liveSearchAjax()"
+                        onkeydown="handleSearch(event)"
                        autocomplete="off">
                 <span class="search-icon">🔍</span>
                 <div id="searchSuggestions" class="search-suggestions"></div>
@@ -1596,7 +1626,6 @@ async function liveSearchAjax() {
 
     const value = input.value.trim();
 
-    // pag empty, ibalik ang normal page para makita lahat ng data ulit
     if (value === '') {
         const url = new URL(window.location.href);
         url.searchParams.delete('search');
@@ -1609,6 +1638,9 @@ async function liveSearchAjax() {
         const response = await fetch(`?ajax_live_search=${encodeURIComponent(value)}`);
         const html = await response.text();
         tableBody.innerHTML = html;
+
+        const selectAll = document.getElementById('selectAllRows');
+        if (selectAll) selectAll.checked = false;
     } catch (error) {
         console.error('Live search error:', error);
     }
