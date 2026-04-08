@@ -292,20 +292,10 @@ if (isset($_GET['ajax_live_search'])) {
             echo "</tr>";
         }
     } else {
-       echo '
-        <tr>
-            <td colspan="6" style="
-                text-align:center;
-                padding:40px 0;
-                color:#777;
-                font-size:14px;
-            ">
-                🔍 No matching results found
-            </td>
-        </tr>';
-    }
+    echo 'NO_RESULTS';
+}
 
-    exit;
+exit;
 }
 
 /* ===== SEARCH ===== */
@@ -1051,6 +1041,27 @@ $result = $conn->query($sql);
 .search-suggestion-item:last-child {
     border-bottom: none;
 }
+.no-data-box {
+    margin-top: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+    background: #f9fbff;
+    border: 1px solid #dbe7f3;
+    border-radius: 10px;
+}
+
+.no-data-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.no-data-text {
+    font-size: 18px;
+    color: #6b7280;
+    font-weight: 500;
+}
 </style>
 </head>
 <body>
@@ -1154,9 +1165,9 @@ $result = $conn->query($sql);
 
         <div class="footer-filter">
             <span>Control #:</span>
-            <select onchange="sortCurrentPage(this.value)">
-                <option value="control_new">New</option>
-                <option value="control_old">Old</option>
+            <select onchange="updateTableControls({ sort: this.value, page: 1 })">
+                <option value="control_new" <?= $sort === 'control_new' ? 'selected' : '' ?>>Newest</option>
+                <option value="control_old" <?= $sort === 'control_old' ? 'selected' : '' ?>>Oldest</option>
             </select>
         </div>
 
@@ -1618,13 +1629,22 @@ document.addEventListener('click', function(e) {
 });
 let searchTimeout;
 
-async function liveSearchAjax() {
+function liveSearchAjax() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(runLiveSearchAjax, 250);
+}
+
+async function runLiveSearchAjax() {
     const input = document.getElementById('certificateSearch');
     const tableBody = document.getElementById('tableBody');
+    const tableContainer = document.querySelector('.table-container');
 
-    if (!input || !tableBody) return;
+    if (!input || !tableBody || !tableContainer) return;
 
     const value = input.value.trim();
+
+    const oldNoDataBox = document.getElementById('ajaxNoDataBox');
+    if (oldNoDataBox) oldNoDataBox.remove();
 
     if (value === '') {
         const url = new URL(window.location.href);
@@ -1637,10 +1657,24 @@ async function liveSearchAjax() {
     try {
         const response = await fetch(`?ajax_live_search=${encodeURIComponent(value)}`);
         const html = await response.text();
-        tableBody.innerHTML = html;
 
-        const selectAll = document.getElementById('selectAllRows');
-        if (selectAll) selectAll.checked = false;
+        if (html.trim() === 'NO_RESULTS') {
+            tableContainer.style.display = 'none';
+
+            const noDataBox = document.createElement('div');
+            noDataBox.id = 'ajaxNoDataBox';
+            noDataBox.className = 'no-data-box';
+            noDataBox.innerHTML = `
+                <div class="no-data-icon">🔍</div>
+                <div class="no-data-text">No matching results found</div>
+            `;
+
+            tableContainer.insertAdjacentElement('afterend', noDataBox);
+            return;
+        }
+
+        tableContainer.style.display = 'block';
+        tableBody.innerHTML = html;
     } catch (error) {
         console.error('Live search error:', error);
     }
