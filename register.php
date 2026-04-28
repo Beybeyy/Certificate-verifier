@@ -84,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 0;
             font-family: Arial, sans-serif;
             background: #f4f6f9;
+            padding: 20px;
         }
 
         .container {
@@ -149,6 +150,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .back:hover {
             text-decoration: underline;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            input {
+                padding: 10px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            button {
+                padding: 14px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
         }
     </style>
 </head>

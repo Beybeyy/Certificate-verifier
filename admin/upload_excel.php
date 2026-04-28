@@ -88,57 +88,158 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Upload Certificates CSV</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; background:#f4f6f8; padding:20px; }
-        h2 { color:#0b4a82; margin-bottom:20px; }
-        form { background:#fff; padding:25px; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.1); max-width:600px; margin-bottom:20px; }
-        input[type="file"] { display:block; margin-bottom:15px; padding:6px; }
-        button { background-color:#0b4a82; color:#fff; padding:10px 25px; border-radius:5px; border:none; cursor:pointer; font-size:16px; }
-        button:hover { background-color:#084a6b; }
-        .messages { background:#fff; padding:15px; border-radius:8px; max-width:600px; box-shadow:0 0 10px rgba(0,0,0,0.05); }
-        .messages p { margin-bottom:5px; font-size:14px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background:#f4f6f8; 
+            padding:20px; 
+            margin: 0;
+        }
+        
+        h2 { 
+            color:#0b4a82; 
+            margin-bottom:20px; 
+            text-align: center;
+        }
+        
+        form { 
+            background:#fff; 
+            padding:25px; 
+            border-radius:10px; 
+            box-shadow:0 0 15px rgba(0,0,0,0.1); 
+            max-width:600px; 
+            margin: 0 auto 20px auto;
+        }
+        
+        input[type="file"] { 
+            display:block; 
+            margin-bottom:15px; 
+            padding:6px; 
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        button { 
+            background-color:#0b4a82; 
+            color:#fff; 
+            padding:10px 25px; 
+            border-radius:5px; 
+            border:none; 
+            cursor:pointer; 
+            font-size:16px; 
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        button:hover { 
+            background-color:#084a6b; 
+        }
+        
+        .messages { 
+            background:#fff; 
+            padding:15px; 
+            border-radius:8px; 
+            max-width:600px; 
+            margin: 0 auto;
+            box-shadow:0 0 10px rgba(0,0,0,0.05); 
+        }
+        
+        .messages p { 
+            margin-bottom:5px; 
+            font-size:14px; 
+        }
+        
         .success { color: #155724; }
         .error { color: #721c24; }
-        <style>
+
         /* The Modal (background) */
         .modal {
-        display: none; 
-        position: fixed; 
-        z-index: 999; 
-        left: 0;
-        top: 0;
-        width: 100%; 
-        height: 100%;
-        overflow: auto; 
-        background-color: rgba(0,0,0,0.5); 
+            display: none; 
+            position: fixed; 
+            z-index: 999; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%;
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.5); 
         }
 
         /* Modal Content */
         .modal-content {
-        background-color: #fefefe;
-        margin: 10% auto; 
-        padding: 20px;
-        border-radius: 10px;
-        width: 400px; 
-        box-shadow: 0 0 20px rgba(0,0,0,0.2);
-        position: relative;
+            background-color: #fefefe;
+            margin: 10% auto; 
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            position: relative;
         }
 
         /* Close Button */
         .close {
-        color: #aaa;
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         .close:hover {
-        color: #000;
+            color: #000;
         }
-</style>
 
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h2 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            form {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+
+            .messages {
+                padding: 12px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+                padding: 15px;
+            }
+
+            input[type="file"] {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            button {
+                padding: 12px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 20px;
+            }
+
+            form {
+                padding: 15px;
+            }
+
+            .modal-content {
+                padding: 12px;
+            }
+        }
     </style>
 </head>
 <body>

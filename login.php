@@ -194,8 +194,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         /* ===== LOGOS & PAGE CONTENT ===== */
         .logo-container { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 10px; }
-        .logo-container img { height: 200px; width: auto; object-fit: contain; }
-        /* ===== LOGIN CARD ===== */
+        .logo-container img {
+                height: clamp(70px, 15vw, 180px); /* responsive size */
+                width: auto;
+                max-width: 100%;
+                object-fit: contain;
+            }
+                    /* ===== LOGIN CARD ===== */
         .login-wrapper {
             flex: 1;
             display: flex;
