@@ -238,6 +238,20 @@ if (isset($_GET['ajax_live_search'])) {
     $search = trim($_GET['ajax_live_search']);
     $safeSearch = $conn->real_escape_string($search);
 
+    $countSql = "
+        SELECT COUNT(*) AS total
+        FROM certificates c
+        LEFT JOIN users u ON c.teacher_id = u.id
+        WHERE
+            c.control_number LIKE '%$safeSearch%' OR
+            c.seminar_title LIKE '%$safeSearch%' OR
+            u.name LIKE '%$safeSearch%' OR
+            c.temp_name LIKE '%$safeSearch%' OR
+            c.teacher_email_pending LIKE '%$safeSearch%'
+    ";
+    $countResult = $conn->query($countSql);
+    $totalResults = (int)($countResult->fetch_assoc()['total'] ?? 0);
+
     $sql = "
         SELECT 
             c.id AS cert_id,
@@ -262,6 +276,7 @@ if (isset($_GET['ajax_live_search'])) {
     $rowNumber = 1;
 
     if ($result && $result->num_rows > 0) {
+        echo 'COUNT:' . $totalResults . "\n";
         while ($row = $result->fetch_assoc()) {
 
             $displayName =
@@ -1148,7 +1163,7 @@ $result = $conn->query($sql);
             $end = 0;
         }
         ?>
-        Showing <b><?= $start ?></b> to <b><?= $end ?></b> of <b><?= $totalRows ?></b> teachers
+        Showing <b id="resultsStart"><?= $start ?></b> to <b id="resultsEnd"><?= $end ?></b> of <b id="resultsTotal"><?= $totalRows ?></b> teachers
     </div>
 
     <div class="footer-right">
@@ -1656,7 +1671,16 @@ async function runLiveSearchAjax() {
 
     try {
         const response = await fetch(`?ajax_live_search=${encodeURIComponent(value)}`);
-        const html = await response.text();
+        let html = await response.text();
+        let totalCount = null;
+
+        if (html.startsWith('COUNT:')) {
+            const newlineIndex = html.indexOf('\n');
+            if (newlineIndex !== -1) {
+                totalCount = parseInt(html.slice(6, newlineIndex).trim(), 10) || 0;
+                html = html.slice(newlineIndex + 1);
+            }
+        }
 
         if (html.trim() === 'NO_RESULTS') {
             tableContainer.style.display = 'none';
@@ -1670,14 +1694,32 @@ async function runLiveSearchAjax() {
             `;
 
             tableContainer.insertAdjacentElement('afterend', noDataBox);
+            updateSearchCount(0, 0, 0);
             return;
         }
 
         tableContainer.style.display = 'block';
         tableBody.innerHTML = html;
+
+        if (totalCount !== null) {
+            const rowCount = tableBody.querySelectorAll('tr').length;
+            updateSearchCount(rowCount > 0 ? 1 : 0, rowCount, totalCount);
+        }
     } catch (error) {
         console.error('Live search error:', error);
     }
+}
+
+function updateSearchCount(start, end, total) {
+    const startEl = document.getElementById('resultsStart');
+    const endEl = document.getElementById('resultsEnd');
+    const totalEl = document.getElementById('resultsTotal');
+
+    if (!startEl || !endEl || !totalEl) return;
+
+    startEl.textContent = start;
+    endEl.textContent = end;
+    totalEl.textContent = total;
 }
 </script>
 
